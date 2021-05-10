@@ -1,0 +1,10 @@
+{
+    "name": "moodle-mod_assignmentques-autosave",
+    "builds": {
+        "moodle-mod_assignmentques-autosave": {
+            "jsfiles": [
+                "autosave.js"
+            ]
+        }
+    }
+}

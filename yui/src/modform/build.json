@@ -1,0 +1,10 @@
+{
+    "name": "moodle-mod_assignmentques-modform",
+    "builds": {
+        "moodle-mod_assignmentques-modform": {
+            "jsfiles": [
+                "modform.js"
+            ]
+        }
+    }
+}

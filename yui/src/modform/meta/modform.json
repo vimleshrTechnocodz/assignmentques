@@ -1,0 +1,9 @@
+{
+    "moodle-mod_assignmentques-modform": {
+        "requires": [
+            "base",
+            "node",
+            "event"
+        ]
+    }
+}

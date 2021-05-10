@@ -1,0 +1,21 @@
+{
+  "name": "moodle-mod_assignmentques-util",
+  "builds": {
+    "moodle-mod_assignmentques-util-base": {
+      "jsfiles": [
+        "base.js"
+      ]
+    },
+    "moodle-mod_assignmentques-util-slot": {
+      "jsfiles": [
+        "slot.js"
+      ]
+    }
+    ,
+    "moodle-mod_assignmentques-util-page": {
+      "jsfiles": [
+        "page.js"
+      ]
+    }
+  }
+}

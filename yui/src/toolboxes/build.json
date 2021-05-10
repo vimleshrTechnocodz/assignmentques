@@ -1,0 +1,12 @@
+{
+    "name": "moodle-mod_assignmentques-toolboxes",
+    "builds": {
+        "moodle-mod_assignmentques-toolboxes": {
+            "jsfiles": [
+                "toolbox.js",
+                "resource.js",
+                "section.js"
+            ]
+        }
+    }
+}

@@ -1,0 +1,8 @@
+{
+    "moodle-mod_assignmentques-assignmentquesbase": {
+        "requires": [
+            "base",
+            "node"
+        ]
+    }
+}

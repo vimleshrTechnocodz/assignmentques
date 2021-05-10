@@ -1,0 +1,14 @@
+{
+    "moodle-mod_assignmentques-toolboxes": {
+        "requires": [
+            "base",
+            "node",
+            "event",
+            "event-key",
+            "io",
+            "moodle-mod_assignmentques-assignmentquesbase",
+            "moodle-mod_assignmentques-util-slot",
+            "moodle-core-notification-ajaxexception"
+        ]
+    }
+}

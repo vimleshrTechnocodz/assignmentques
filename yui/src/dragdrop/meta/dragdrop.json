@@ -1,0 +1,19 @@
+{
+    "moodle-mod_assignmentques-dragdrop": {
+        "requires": [
+            "base",
+            "node",
+            "io",
+            "dom",
+            "dd",
+            "dd-scroll",
+            "moodle-core-dragdrop",
+            "moodle-core-notification",
+            "moodle-mod_assignmentques-assignmentquesbase",
+            "moodle-mod_assignmentques-util-base",
+            "moodle-mod_assignmentques-util-page",
+            "moodle-mod_assignmentques-util-slot",
+            "moodle-course-util"
+        ]
+    }
+}

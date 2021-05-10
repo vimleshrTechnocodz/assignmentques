@@ -1,0 +1,15 @@
+#page-mod-assignmentques-report #manualgradingform {
+    width: 100%;
+}
+
+#page-mod-assignmentques-report #manualgradingform.mform br {
+    clear: none;
+}
+
+#page-mod-assignmentques-report #manualgradingform.mform .clearfix:after {
+    clear: none;
+}
+
+#page-mod-assignmentques-report #manualgradingform .que {
+    margin-bottom: 0.7em;
+}
