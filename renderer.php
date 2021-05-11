@@ -181,8 +181,11 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
      */
     public function questions(assignmentques_attempt $attemptobj, $reviewing, $slots, $page, $showall,
                               mod_assignmentques_display_options $displayoptions) {
+        global $CFG;
+        $uniqueid=$attemptobj->get_attempt()->uniqueid;
         $output = '';
         foreach ($slots as $slot) { 
+            $prifix='q' . $uniqueid . ':' . $slot . '_';
             $output .= html_writer::start_tag('div',array(
                 'style'=>'background: #ddd; padding: 5px;margin-bottom: 30px;',
                 'id'    => 'goto_'.$slot,
@@ -190,6 +193,48 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
             )); 
             $output .= $attemptobj->render_question($slot, $reviewing, $this,
                     $attemptobj->review_url($slot, $page, $showall));
+            $output .='<form method="post" class="mform" id="manualgradingform" action="' .
+            $CFG->wwwroot . '/mod/assignmentques/comment.php">';            
+            $output .= html_writer::start_tag('div',array(
+                'style'=>'background: #ddd; padding: 5px;',
+                'id'    => 'comment_'.$slot,
+                'class' => 'commentlink'
+            ));
+            $output.='<div>
+                        <input type="hidden" name="attempt" value="'.$attemptobj->get_attemptid().'" />
+                        <input type="hidden" name="slot" value="'.$slot.'" />
+                        <input type="hidden" name="slots" value="'.$slot.'" />
+                        <input type="hidden" name="sesskey" value="'.sesskey().'" />
+                        <input type="hidden" name="'.$prifix.'-commentformat" value="1">
+                        <input type="hidden" name="redirect" value="1";
+                    </div>';           
+            $output.= html_writer::select(
+                    array(
+                            'needcorrection' => 'Need Correction', 
+                            'passedtoiqa' => 'Passed To IQA', 
+                            'needcorrectioniqa' => 'Need Correction IQA',
+                            'iqaagreeonpass' => 'IQA Agree on a pass',
+                    ), 
+                    'state', 0);            
+            $output.= html_writer::start_tag('textarea',array(               
+                'id'    => $prifix.'-comment_id',
+                'class' => 'commentlink',
+                'name' => $prifix.'-comment'
+            ));            
+            $output.= html_writer::end_tag('textarea');
+            $output.='<fieldset class="hidden">
+                    <div>
+                        <div class="fitem fitem_actionbuttons fitem_fsubmit">
+                            <fieldset class="felement fsubmit">
+                                <input id="id_submitbutton" type="submit" name="submit" class="btn btn-primary" 
+                                value="'.get_string('save', 'assignmentques').'"/>
+                            </fieldset>
+                        </div>
+                    </div>
+                </fieldset>';
+            $output .='</form>';
+            $output .= html_writer::end_tag('div');
+            $output .= html_writer::end_tag('div');
             $output .= html_writer::end_tag('div');
         }
         return $output;

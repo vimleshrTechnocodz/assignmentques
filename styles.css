@@ -1251,6 +1251,21 @@ table#categoryquestions {
 .path-mod-assignmentques #mod_assignmentques_navblock .qnbutton.notanswered .trafficlight, .path-mod-assignmentques #mod_assignmentques_navblock .qnbutton.incorrect .trafficlight {
     background-color: #b94a48;
 }
+.quewrap .readonly{
+    min-height: auto !important;
+}
+
+.commentlink select{
+    margin: 8px;
+    height: 30px;
+}
+.commentlink textarea{
+    width: 94%;
+    margin: 8px;
+}
+.commentlink .felement.fsubmit{
+    margin: 0px !important;
+}
 /** Print formatting for attempt and review pages **/
 
 @media print {

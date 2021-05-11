@@ -208,8 +208,16 @@ M.mod_assignmentques.nav.init = function(Y) {
     }
     if (Y.one('.quewrap div.que')) {
         Y.on('click', function(e) {
-           
+            e.preventDefault(); 
+
         }, '.quewrap div.que');
+    }
+
+    if (Y.one('.commentlink a.costomecomment')) {
+        Y.on('click', function(e) {
+            e.preventDefault();   
+            console.log("hello");
+        }, '.commentlink a.costomecomment');
     }
 };
 

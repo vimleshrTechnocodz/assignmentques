@@ -1441,10 +1441,14 @@ function assignmentques_get_review_options($assignmentques, $attempt, $context) 
 
     // Show a link to the comment box only for closed attempts.
     if (!empty($attempt->id) && $attempt->state == assignmentques_attempt::FINISHED && !$attempt->preview &&
-            !is_null($context) && has_capability('mod/assignmentques:grade', $context)) {
+            !is_null($context) && has_capability('mod/assignmentques:grade', $context)) {        
+                $options->manualcomment = question_display_options::VISIBLE;
+        $options->manualcommentlink = new moodle_url('/mod/assignmentques/comment.php',
+                array('attempt' => $attempt->id));        
+    }elseif(!empty($attempt->id)){        
         $options->manualcomment = question_display_options::VISIBLE;
         $options->manualcommentlink = new moodle_url('/mod/assignmentques/comment.php',
-                array('attempt' => $attempt->id));
+                array('attempt' => $attempt->id));        
     }
 
     if (!is_null($context) && !$attempt->preview &&

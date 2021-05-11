@@ -28,6 +28,7 @@ require_once('locallib.php');
 
 $attemptid = required_param('attempt', PARAM_INT);
 $slot = required_param('slot', PARAM_INT); // The question number in the attempt.
+$redirect = optional_param('redirect',null, PARAM_INT);
 $cmid = optional_param('cmid', null, PARAM_INT);
 
 $PAGE->set_url('/mod/assignmentques/comment.php', array('attempt' => $attemptid, 'slot' => $slot));
@@ -37,7 +38,7 @@ $student = $DB->get_record('user', array('id' => $attemptobj->get_userid()));
 
 // Can only grade finished attempts.
 if (!$attemptobj->is_finished()) {
-    print_error('attemptclosed', 'assignmentques');
+    //print_error('attemptclosed', 'assignmentques');
 }
 
 // Check login and permissions.
@@ -80,11 +81,12 @@ $summarydata['questionname'] = array(
 
 // Process any data that was submitted.
 if (data_submitted() && confirm_sesskey()) {
+    
     if (optional_param('submit', false, PARAM_BOOL) && question_engine::is_manual_grade_in_range($attemptobj->get_uniqueid(), $slot)) {
-        $transaction = $DB->start_delegated_transaction();
-        $attemptobj->process_submitted_actions(time());
+        $transaction = $DB->start_delegated_transaction();       
+        $attemptobj->process_submitted_actions(time());        
         $transaction->allow_commit();
-
+        
         // Log this action.
         $params = array(
             'objectid' => $attemptobj->get_question_attempt($slot)->get_question()->id,
@@ -96,11 +98,15 @@ if (data_submitted() && confirm_sesskey()) {
                 'slot' => $slot
             )
         );
-        $event = \mod_assignmentques\event\question_manually_graded::create($params);
-        $event->trigger();
-
-        echo $output->notification(get_string('changessaved'), 'notifysuccess');
-        close_window(2, true);
+        $event = \mod_assignmentques\event\question_manually_graded::create($params);       
+        $event->trigger(); 
+         
+        if($redirect){ 
+            redirect($CFG->wwwroot.'/mod/assignmentques/review.php?attempt='.$attemptobj->get_attemptid(), get_string('changessaved'), null, \core\output\notification::NOTIFY_SUCCESS);
+        }else{
+            echo $output->notification(get_string('changessaved'), 'notifysuccess');
+            close_window(2, true);
+        }
         die;
     }
 }

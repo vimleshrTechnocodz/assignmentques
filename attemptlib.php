@@ -1120,12 +1120,12 @@ class assignmentques_attempt {
      */
     public function get_display_options($reviewing) {
         if ($reviewing) {
-            if (is_null($this->reviewoptions)) {
+            if (is_null($this->reviewoptions)) {               
                 $this->reviewoptions = assignmentques_get_review_options($this->get_assignmentques(),
                         $this->attempt, $this->assignmentquesobj->get_context());
-                if ($this->is_own_preview()) {
+                if ($this->is_own_preview()) {                   
                     // It should  always be possible for a teacher to review their
-                    // own preview irrespective of the review options settings.
+                    // own preview irrespective of the review options settings.                   
                     $this->reviewoptions->attempt = true;
                 }
             }
@@ -1696,7 +1696,8 @@ class assignmentques_attempt {
      * @return string HTML for the question in its current state.
      */
     public function render_question($slot, $reviewing, mod_assignmentques_renderer $renderer, $thispageurl = null) {
-        if ($this->is_blocked_by_previous_question($slot)) {
+        
+        if ($this->is_blocked_by_previous_question($slot)) {            
             $placeholderqa = $this->make_blocked_question_placeholder($slot);
 
             $displayoptions = $this->get_display_options($reviewing);
@@ -1708,7 +1709,7 @@ class assignmentques_attempt {
                     $this->get_question_number($this->get_original_slot($slot))),
                     'mod_assignmentques-blocked_question_warning');
         }
-
+        
         return $this->render_question_helper($slot, $reviewing, $thispageurl, $renderer, null);
     }
 
@@ -1727,20 +1728,21 @@ class assignmentques_attempt {
         $originalslot = $this->get_original_slot($slot);
         $number = $this->get_question_number($originalslot);
         $displayoptions = $this->get_display_options_with_edit_link($reviewing, $slot, $thispageurl);
-
+        
         if ($slot != $originalslot) {
+            
             $originalmaxmark = $this->get_question_attempt($slot)->get_max_mark();
             $this->get_question_attempt($slot)->set_max_mark($this->get_question_attempt($originalslot)->get_max_mark());
         }
 
-        if ($this->can_question_be_redone_now($slot)) {
+        if ($this->can_question_be_redone_now($slot)) {            
             $displayoptions->extrainfocontent = $renderer->redo_question_button(
                     $slot, $displayoptions->readonly);
         }
 
-        if ($displayoptions->history && $displayoptions->questionreviewlink) {
-            $links = $this->links_to_other_redos($slot, $displayoptions->questionreviewlink);
-            if ($links) {
+        if ($displayoptions->history && $displayoptions->questionreviewlink) {           
+            $links = $this->links_to_other_redos($slot, $displayoptions->questionreviewlink);            
+            if ($links) {               
                 $displayoptions->extrahistorycontent = html_writer::tag('p',
                         get_string('redoesofthisquestion', 'assignmentques', $renderer->render($links)));
             }
@@ -1752,7 +1754,7 @@ class assignmentques_attempt {
             $output = $this->quba->render_question_at_step($slot, $seq, $displayoptions, $number);
         }
 
-        if ($slot != $originalslot) {
+        if ($slot != $originalslot) {           
             $this->get_question_attempt($slot)->set_max_mark($originalmaxmark);
         }
 
@@ -2027,8 +2029,7 @@ class assignmentques_attempt {
      *      This second method will probably get deprecated one day.
      */
     public function process_submitted_actions($timestamp, $becomingoverdue = false, $simulatedresponses = null) {
-        global $DB;
-
+        global $DB;        
         $transaction = $DB->start_delegated_transaction();
 
         if ($simulatedresponses !== null) {
@@ -2040,9 +2041,8 @@ class assignmentques_attempt {
             }
         } else {
             $simulatedpostdata = null;
-        }
-
-        $this->quba->process_all_actions($timestamp, $simulatedpostdata);
+        }        
+        $this->quba->process_all_actions($timestamp, $simulatedpostdata);       
         question_engine::save_questions_usage_by_activity($this->quba);
 
         $this->attempt->timemodified = $timestamp;
