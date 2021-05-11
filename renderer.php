@@ -182,9 +182,15 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
     public function questions(assignmentques_attempt $attemptobj, $reviewing, $slots, $page, $showall,
                               mod_assignmentques_display_options $displayoptions) {
         $output = '';
-        foreach ($slots as $slot) {
+        foreach ($slots as $slot) { 
+            $output .= html_writer::start_tag('div',array(
+                'style'=>'background: #ddd; padding: 5px;margin-bottom: 30px;',
+                'id'    => 'goto_'.$slot,
+                'class' => 'quewrap'
+            )); 
             $output .= $attemptobj->render_question($slot, $reviewing, $this,
                     $attemptobj->review_url($slot, $page, $showall));
+            $output .= html_writer::end_tag('div');
         }
         return $output;
     }
@@ -486,9 +492,21 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
         $output .= html_writer::start_tag('div');
 
         // Print all the questions.
-        foreach ($slots as $slot) {
-            $output .= $attemptobj->render_question($slot, false, $this,
-                    $attemptobj->attempt_url($slot, $page), $this);
+        foreach ($slots as $slot) {       
+            $output .= html_writer::start_tag('div',array(
+                                'style'=>'background: #ddd; padding: 5px;margin-bottom: 30px;',
+                                'id'    => 'goto_'.$slot,
+                                'class' => 'quewrap'
+                            ));     
+                $output .= html_writer::link(new moodle_url('', array('returnurl'=>$slot)),
+                            'Submit',array(
+                                'class' => 'endtestlink btn btn-default',                               
+                                'style' => 'float:right;margin: 8px;'
+                            ));
+                
+                $output .= $attemptobj->render_question($slot, false, $this,
+                    $attemptobj->attempt_url($slot, $page), $this);  
+            $output .= html_writer::end_tag('div');         
         }
 
         $navmethod = $attemptobj->get_assignmentques()->navmethod;

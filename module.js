@@ -154,7 +154,7 @@ M.mod_assignmentques.nav.init = function(Y) {
 
     var form = Y.one('#responseform');
     if (form) {
-        function nav_to_page(pageno) {
+        function nav_to_page(pageno,returnurl='') {            
             Y.one('#followingpage').set('value', pageno);
 
             // Automatically submit the form. We do it this strange way because just
@@ -190,13 +190,26 @@ M.mod_assignmentques.nav.init = function(Y) {
 
     if (Y.one('a.endtestlink')) {
         Y.on('click', function(e) {
-            e.preventDefault();
-            nav_to_page(-1);
+            e.preventDefault();           
+            var pageidmatch = this.get('href').match(/returnurl=(\d+)/);
+            var pageno;
+            if (pageidmatch) {
+                pageno = pageidmatch[1];
+            }else{
+                pageno =-1;
+            }
+            nav_to_page(pageno);
+
         }, 'a.endtestlink');
     }
 
     if (M.core_question_flags) {
         M.core_question_flags.add_listener(M.mod_assignmentques.nav.update_flag_state);
+    }
+    if (Y.one('.quewrap div.que')) {
+        Y.on('click', function(e) {
+           
+        }, '.quewrap div.que');
     }
 };
 
