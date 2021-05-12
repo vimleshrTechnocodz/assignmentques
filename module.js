@@ -206,18 +206,14 @@ M.mod_assignmentques.nav.init = function(Y) {
     if (M.core_question_flags) {
         M.core_question_flags.add_listener(M.mod_assignmentques.nav.update_flag_state);
     }
-    if (Y.one('.quewrap div.que')) {
-        Y.on('click', function(e) {
-            e.preventDefault(); 
-
-        }, '.quewrap div.que');
-    }
-
-    if (Y.one('.commentlink a.costomecomment')) {
+    if (Y.one('.collapsedtoggel')) {
         Y.on('click', function(e) {
             e.preventDefault();   
-            console.log("hello");
-        }, '.commentlink a.costomecomment');
+            var pageidmatch = this.get('href');
+            var arrayd = pageidmatch.split('#');            
+            var tggeldiv = Y.one('#'+arrayd[1]);
+            tggeldiv.toggleClass('collapsed');              
+        }, '.collapsedtoggel');
     }
 };
 

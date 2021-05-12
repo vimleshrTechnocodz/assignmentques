@@ -198,5 +198,23 @@
         <KEY NAME="tagid" TYPE="foreign" FIELDS="tagid" REFTABLE="tag" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
+    <TABLE NAME="assignmentques_comment" COMMENT="Stories teacher, supervisor comments">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="question_attempt_step_dataid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The assignmentques question_attempt_step_data id"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Foreign key references user.id.  Can be null if this is a per-group override."/>
+        <FIELD NAME="attempt" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Attempt id"/>
+        <FIELD NAME="slot" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Ques slot"/>
+        <FIELD NAME="comment" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Store comments"/>
+        <FIELD NAME="status" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="status of comment"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The time when the assignmentques_comment was added to the comment."/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="question_attempt_step_dataid" TYPE="foreign" FIELDS="question_attempt_step_dataid" REFTABLE="question_attempt_step_data" REFFIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+
   </TABLES>
 </XMLDB>

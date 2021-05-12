@@ -28,7 +28,9 @@ require_once('locallib.php');
 
 $attemptid = required_param('attempt', PARAM_INT);
 $slot = required_param('slot', PARAM_INT); // The question number in the attempt.
-$redirect = optional_param('redirect',null, PARAM_INT);
+$forcecomment = optional_param('forcecomment',null, PARAM_INT);
+$status = optional_param('status',null, PARAM_RAW);
+$commentdata = optional_param('commentdata',null, PARAM_RAW);
 $cmid = optional_param('cmid', null, PARAM_INT);
 
 $PAGE->set_url('/mod/assignmentques/comment.php', array('attempt' => $attemptid, 'slot' => $slot));
@@ -81,8 +83,55 @@ $summarydata['questionname'] = array(
 
 // Process any data that was submitted.
 if (data_submitted() && confirm_sesskey()) {
-    
-    if (optional_param('submit', false, PARAM_BOOL) && question_engine::is_manual_grade_in_range($attemptobj->get_uniqueid(), $slot)) {
+    if($forcecomment){
+        $commentTime=time();
+        $uniqueid=$attemptobj->get_attempt()->uniqueid;
+        $slotNumber=$slot;
+        $conditions = array('questionusageid'=>$uniqueid,'slot'=>$slot);
+        $sequence = $attemptobj->get_question_attempt($slot)->get_sequence_check_count();
+        $currentUserID=$USER->id;
+        $questionAttempt=$DB->get_record('question_attempts', $conditions);
+        if($questionAttempt){
+            $attempt_steps=new stdClass();
+            $attempt_steps->questionattemptid=$questionAttempt->id;
+            $attempt_steps->sequencenumber=$sequence;
+            $attempt_steps->state='complete';
+            $attempt_steps->timecreated=$commentTime;
+            $attempt_steps->userid=$currentUserID;
+            $insId = $DB->insert_record('question_attempt_steps', $attempt_steps);
+            if($insId){                
+                $attempt_step_data = new stdClass();
+                $attempt_step_data->attemptstepid=$insId;
+                $attempt_step_data->name='-comment';
+                $attempt_step_data->value=$commentdata;
+                $insDataId = $DB->insert_record('question_attempt_step_data', $attempt_step_data);
+                if($insDataId){
+                    $assignmentques_comment = new stdClass();
+                    $assignmentques_comment->question_attempt_step_dataid = $insDataId;
+                    $assignmentques_comment->userid = $currentUserID;
+                    $assignmentques_comment->comment = $commentdata;
+                    $assignmentques_comment->attempt = $attemptid;
+                    $assignmentques_comment->slot = $slotNumber;
+                    $assignmentques_comment->timecreated = $commentTime;
+                    $assignmentques_comment->status = $status;
+                    $insCommentDataId = $DB->insert_record('assignmentques_comment', $assignmentques_comment);
+                    if($insCommentDataId){
+                        redirect($CFG->wwwroot.'/mod/assignmentques/review.php?attempt='.$attemptobj->get_attemptid(), get_string('changessaved'), null, \core\output\notification::NOTIFY_SUCCESS);
+                    }else{
+                        redirect($CFG->wwwroot.'/mod/assignmentques/review.php?attempt='.$attemptobj->get_attemptid(), get_string('notchangessaved'), null, \core\output\notification::NOTIFY_ERROR);
+                    }
+                }
+                else{
+                    redirect($CFG->wwwroot.'/mod/assignmentques/review.php?attempt='.$attemptobj->get_attemptid(), get_string('notchangessaved'), null, \core\output\notification::NOTIFY_ERROR);
+                }
+            }else{
+                redirect($CFG->wwwroot.'/mod/assignmentques/review.php?attempt='.$attemptobj->get_attemptid(), get_string('notchangessaved'), null, \core\output\notification::NOTIFY_ERROR);
+            }
+        }else{
+            redirect($CFG->wwwroot.'/mod/assignmentques/review.php?attempt='.$attemptobj->get_attemptid(), get_string('notchangessaved'), null, \core\output\notification::NOTIFY_ERROR);
+        }
+        die;
+    }else if (optional_param('submit', false, PARAM_BOOL) && question_engine::is_manual_grade_in_range($attemptobj->get_uniqueid(), $slot)) {
         $transaction = $DB->start_delegated_transaction();       
         $attemptobj->process_submitted_actions(time());        
         $transaction->allow_commit();
@@ -100,13 +149,9 @@ if (data_submitted() && confirm_sesskey()) {
         );
         $event = \mod_assignmentques\event\question_manually_graded::create($params);       
         $event->trigger(); 
-         
-        if($redirect){ 
-            redirect($CFG->wwwroot.'/mod/assignmentques/review.php?attempt='.$attemptobj->get_attemptid(), get_string('changessaved'), null, \core\output\notification::NOTIFY_SUCCESS);
-        }else{
-            echo $output->notification(get_string('changessaved'), 'notifysuccess');
-            close_window(2, true);
-        }
+        echo $output->notification(get_string('changessaved'), 'notifysuccess');
+        close_window(2, true);
+       
         die;
     }
 }

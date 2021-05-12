@@ -168,31 +168,16 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
         $output .= html_writer::end_tag('table');
         return $output;
     }
-
-    /**
-     * Renders each question
-     *
-     * @param assignmentques_attempt $attemptobj instance of assignmentques_attempt
-     * @param bool $reviewing
-     * @param array $slots array of intgers relating to questions
-     * @param int $page current page number
-     * @param bool $showall if true shows attempt on single page
-     * @param mod_assignmentques_display_options $displayoptions instance of mod_assignmentques_display_options
-     */
-    public function questions(assignmentques_attempt $attemptobj, $reviewing, $slots, $page, $showall,
-                              mod_assignmentques_display_options $displayoptions) {
-        global $CFG;
-        $uniqueid=$attemptobj->get_attempt()->uniqueid;
-        $output = '';
-        foreach ($slots as $slot) { 
-            $prifix='q' . $uniqueid . ':' . $slot . '_';
-            $output .= html_writer::start_tag('div',array(
-                'style'=>'background: #ddd; padding: 5px;margin-bottom: 30px;',
-                'id'    => 'goto_'.$slot,
-                'class' => 'quewrap'
-            )); 
-            $output .= $attemptobj->render_question($slot, $reviewing, $this,
-                    $attemptobj->review_url($slot, $page, $showall));
+    /*******Custome Comment Form******/
+    public function customeComment($questionComment,$attemptobj,$slot,$prifix){
+        global $CFG,$DB;
+        $output='';
+        $labl='';
+            if($questionComment){
+                $st=!empty(end($questionComment)->status)?get_string(end($questionComment)->status,'assignmentques'):get_string('commented','assignmentques');
+                $labl='<label class="commentedques">'.get_string('currantstatus','assignmentques').': <strong>'.$st.'</strong></label>';      
+            }
+            $output .=$labl;
             $output .='<form method="post" class="mform" id="manualgradingform" action="' .
             $CFG->wwwroot . '/mod/assignmentques/comment.php">';            
             $output .= html_writer::start_tag('div',array(
@@ -206,20 +191,20 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
                         <input type="hidden" name="slots" value="'.$slot.'" />
                         <input type="hidden" name="sesskey" value="'.sesskey().'" />
                         <input type="hidden" name="'.$prifix.'-commentformat" value="1">
-                        <input type="hidden" name="redirect" value="1";
+                        <input type="hidden" name="forcecomment" value="1"/>
                     </div>';           
             $output.= html_writer::select(
                     array(
-                            'needcorrection' => 'Need Correction', 
-                            'passedtoiqa' => 'Passed To IQA', 
-                            'needcorrectioniqa' => 'Need Correction IQA',
-                            'iqaagreeonpass' => 'IQA Agree on a pass',
+                            'needcorrection' => get_string('needcorrection', 'assignmentques'), 
+                            'passedtoiqa' => get_string('passedtoiqa', 'assignmentques'), 
+                            'needcorrectioniqa' => get_string('needcorrectioniqa', 'assignmentques'), 
+                            'iqaagreeonpass' => get_string('iqaagreeonpass', 'assignmentques'), 
                     ), 
-                    'state', 0);            
+                    'status', 0);            
             $output.= html_writer::start_tag('textarea',array(               
                 'id'    => $prifix.'-comment_id',
                 'class' => 'commentlink',
-                'name' => $prifix.'-comment'
+                'name' => 'commentdata'
             ));            
             $output.= html_writer::end_tag('textarea');
             $output.='<fieldset class="hidden">
@@ -232,9 +217,130 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
                         </div>
                     </div>
                 </fieldset>';
-            $output .='</form>';
+            $output .='</form>';            
             $output .= html_writer::end_tag('div');
-            $output .= html_writer::end_tag('div');
+            return $output;
+    }
+    /*******Custome Comment end******/
+    /*******Response history******/
+    public function responseHistory($attemptid,$slot){
+        /*******Get history table table********/
+        global $CFG,$DB;
+        $output='';
+        $sql="SELECT
+        qasd.id,
+        assqusatt.userid,
+        assqusatt.assignmentques,
+        assqusatt.id AS assqusattid,
+        assqusatt.attempt,
+        assqusatt.sumgrades,
+        qu.preferredbehaviour,
+        qa.slot,
+        qa.behaviour,
+        qa.questionid,
+        qa.variant,
+        qa.maxmark,
+        qa.minfraction,
+        qa.flagged,
+        qas.sequencenumber,
+        qas.state,
+        qas.fraction, 
+        qas.timecreated,   
+        qas.userid,
+        qasd.name,
+        qasd.value,
+        qa.questionsummary,
+        qa.rightanswer,
+        qa.responsesummary      
+        FROM mdl_assignmentques_attempts assqusatt
+        JOIN mdl_question_usages qu ON qu.id = assqusatt.uniqueid
+        JOIN mdl_question_attempts qa ON qa.questionusageid = qu.id
+        JOIN mdl_question_attempt_steps qas ON qas.questionattemptid = qa.id
+        LEFT JOIN mdl_question_attempt_step_data qasd ON qasd.attemptstepid = qas.id 
+        WHERE assqusatt.id = $attemptid and slot=$slot";
+        $history=$DB->get_records_sql($sql);        
+        $output.='<div class="responsehistory">
+                <h4 class="responsehistoryheader">'.get_string('responsehistory','assignmentques').'</h4>
+                <table class="generaltable">
+                    <thead>
+                        <tr>
+                        <th class="header c0" style="" scope="col">Step</th>
+                        <th class="header c1" style="" scope="col">Time</th>
+                        <th class="header c2" style="" scope="col">Action</th>
+                        <th class="header c3" style="" scope="col">State</th>
+                        </tr>
+                    </thead>
+                    <tbody>';
+        $step=0;
+        foreach($history as $data){             
+            if($data->name=='' or $data->name=='-comment' or $data->name=='answer'){                
+                $step++;
+                $status='';
+                $condition = array('question_attempt_step_dataid'=>$data->id);                      
+                $questionComment=$DB->get_record('assignmentques_comment', $condition);
+                if($questionComment){
+                    $status=$questionComment->status;                   
+                }
+                if($data->name==''){
+                    $output.='<tr>
+                    <td class="header c0" style="" scope="col">'.$step.'</td>
+                    <td class="header c1" style="" scope="col">'.date("Y/m/d, h:i", $data->timecreated).'</td>
+                    <td class="header c2" style="" scope="col">Started</td>
+                    <td class="header c3" style="" scope="col">'.get_string('notyetanswered','assignmentques').'</td>
+                    </tr>';
+                }elseif($data->name=='-comment'){
+                    $stet=!empty($status)?get_string($status,'assignmentques'):get_string('commented','assignmentques');
+                    $output.='<tr>
+                    <td class="header c0" style="" scope="col">'.$step.'</td>
+                    <td class="header c1" style="" scope="col">'.date("Y/m/d, h:i", $data->timecreated).'</td>
+                    <td class="header c2" style="" scope="col">'.get_string('commented','assignmentques').': '.$data->value.'</td>
+                    <td class="header c3" style="" scope="col">'.$stet.'</td>
+                    </tr>'; 
+                }elseif($data->name=='answer'){
+                    $output.='<tr>
+                    <td class="header c0" style="" scope="col">'.$step.'</td>
+                    <td class="header c1" style="" scope="col">'.date("Y/m/d, h:i", $data->timecreated).'</td>
+                    <td class="header c2" style="" scope="col">'.get_string('saved','assignmentques').': '.$data->value.'</td>
+                    <td class="header c3" style="" scope="col">'.get_string('answersaved','assignmentques').'</td>
+                    </tr>'; 
+                }                  
+            }    
+        }
+        $output.=    '</tbody>';
+        $output.=  '</table></div>';
+        return $output;
+        /*******Get hestory table table end********/
+    }
+
+    /**
+     * Renders each question
+     *
+     * @param assignmentques_attempt $attemptobj instance of assignmentques_attempt
+     * @param bool $reviewing
+     * @param array $slots array of intgers relating to questions
+     * @param int $page current page number
+     * @param bool $showall if true shows attempt on single page
+     * @param mod_assignmentques_display_options $displayoptions instance of mod_assignmentques_display_options
+     */
+    public function questions(assignmentques_attempt $attemptobj, $reviewing, $slots, $page, $showall,
+                              mod_assignmentques_display_options $displayoptions) {
+        global $CFG,$DB;
+        $uniqueid=$attemptobj->get_attempt()->uniqueid;                 
+        $output = '';
+        foreach ($slots as $slot) {            
+            $attemptid=$attemptobj->get_attemptid();   
+            $conditions = array('attempt'=>$attemptid,'slot'=>$slot);              
+            $questionComment=$DB->get_records('assignmentques_comment', $conditions);            
+            $prifix='q' . $uniqueid . ':' . $slot . '_';
+            $output .= html_writer::start_tag('div',array(                
+                'id'    => 'goto_'.$slot,
+                'class' => 'quewrap collapsed'
+            ));
+            $output .='<a class="collapsedtoggel" href="#goto_'.$slot.'"><i class="fa fa-angle-down" aria-hidden="true"></i></a>';
+            $output .= $attemptobj->render_question($slot, $reviewing, $this,
+                    $attemptobj->review_url($slot, $page, $showall));            
+            $output .=$this->responseHistory($attemptid,$slot);
+            $output .=$this->customeComment($questionComment,$attemptobj,$slot,$prifix);           
             $output .= html_writer::end_tag('div');
         }
         return $output;
@@ -527,7 +633,7 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
      */
     public function attempt_form($attemptobj, $page, $slots, $id, $nextpage) {
         $output = '';
-
+        global $DB;
         // Start the form.
         $output .= html_writer::start_tag('form',
                 array('action' => new moodle_url($attemptobj->processattempt_url(),
@@ -537,19 +643,36 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
         $output .= html_writer::start_tag('div');
 
         // Print all the questions.
-        foreach ($slots as $slot) {       
-            $output .= html_writer::start_tag('div',array(
-                                'style'=>'background: #ddd; padding: 5px;margin-bottom: 30px;',
+        foreach ($slots as $slot) {
+            $attemptid=$attemptobj->get_attemptid(); 
+            $conditions = array('attempt'=>$attemptid,'slot'=>$slot);              
+            $questionComment=$DB->get_records('assignmentques_comment', $conditions);            
+            $disable='';
+            $labl='';
+            if($questionComment){
+                if(
+                    end($questionComment)->status=='passedtoiqa' or 
+                    end($questionComment)->status=='iqaagreeonpass'
+                ){
+                    $disable='disable';
+                    $labl='<label class="doneques">'.get_string(end($questionComment)->status,'assignmentques').'</label>';
+                }else{
+                    $disable='';
+                }              
+            }
+            $output .= html_writer::start_tag('div',array(                                
                                 'id'    => 'goto_'.$slot,
-                                'class' => 'quewrap'
-                            ));     
-                $output .= html_writer::link(new moodle_url('', array('returnurl'=>$slot)),
+                                'class' => 'quewrap collapsed '.$disable
+                            ));
+            $output .='<a class="collapsedtoggel" href="#goto_'.$slot.'"><i class="fa fa-angle-down" aria-hidden="true"></i></a>';  
+            $output .=  $labl;
+            $output .= html_writer::link(new moodle_url('', array('returnurl'=>$slot)),
                             'Submit',array(
                                 'class' => 'endtestlink btn btn-default',                               
-                                'style' => 'float:right;margin: 8px;'
+                                'style' => 'float:right;margin: 8px 50px 0 0;'
                             ));
                 
-                $output .= $attemptobj->render_question($slot, false, $this,
+            $output .= $attemptobj->render_question($slot, false, $this,
                     $attemptobj->attempt_url($slot, $page), $this);  
             $output .= html_writer::end_tag('div');         
         }
