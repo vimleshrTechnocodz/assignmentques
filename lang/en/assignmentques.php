@@ -1005,3 +1005,7 @@ $string['saved']= 'Saved';
 $string['answersaved'] = 'Answer saved';
 $string['responsehistory'] = 'Response history';
 $string['currantstatus'] = 'Currant Status';
+$string['learneranswer'] = 'Learner Answer';
+$string['assessorfeedback'] = 'Assessor feedback';
+
+

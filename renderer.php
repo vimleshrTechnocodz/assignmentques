@@ -258,23 +258,13 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
         JOIN mdl_question_attempt_steps qas ON qas.questionattemptid = qa.id
         LEFT JOIN mdl_question_attempt_step_data qasd ON qasd.attemptstepid = qas.id 
         WHERE assqusatt.id = $attemptid and slot=$slot";
-        $history=$DB->get_records_sql($sql);        
+        $history=$DB->get_records_sql($sql);   
         $output.='<div class="responsehistory">
-                <h4 class="responsehistoryheader">'.get_string('responsehistory','assignmentques').'</h4>
-                <table class="generaltable">
-                    <thead>
-                        <tr>
-                        <th class="header c0" style="" scope="col">Step</th>
-                        <th class="header c1" style="" scope="col">Time</th>
-                        <th class="header c2" style="" scope="col">Action</th>
-                        <th class="header c3" style="" scope="col">State</th>
-                        </tr>
-                    </thead>
-                    <tbody>';
-        $step=0;
+                <!--<h4 class="responsehistoryheader">'.get_string('responsehistory','assignmentques').'</h4>-->
+               ';
+        $answ=0;$feedcount=0;
         foreach($history as $data){             
-            if($data->name=='' or $data->name=='-comment' or $data->name=='answer'){                
-                $step++;
+            if($data->name=='' or $data->name=='-comment' or $data->name=='answer'){  
                 $status='';
                 $condition = array('question_attempt_step_dataid'=>$data->id);                      
                 $questionComment=$DB->get_record('assignmentques_comment', $condition);
@@ -282,27 +272,39 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
                     $status=$questionComment->status;                   
                 }
                 if($data->name==''){
-                    $output.='<tr>
-                    <td class="header c0" style="" scope="col">'.$step.'</td>
-                    <td class="header c1" style="" scope="col">'.date("Y/m/d, h:i", $data->timecreated).'</td>
-                    <td class="header c2" style="" scope="col">Started</td>
-                    <td class="header c3" style="" scope="col">'.get_string('notyetanswered','assignmentques').'</td>
-                    </tr>';
+                    $answ++;
+                    $output.='
+                    <div class="notstarted">
+                        <h4>'.get_string('learneranswer','assignmentques').' '. $answ .'</h4>                       
+                        <div class="contectarea">
+                         <p>'.get_string('notyetanswered','assignmentques').'</p>
+                        </div>
+                    </div>';
                 }elseif($data->name=='-comment'){
-                    $stet=!empty($status)?get_string($status,'assignmentques'):get_string('commented','assignmentques');
-                    $output.='<tr>
-                    <td class="header c0" style="" scope="col">'.$step.'</td>
+                    $feedcount++;
+                    $stet=!empty($status)?get_string($status,'assignmentques'):get_string('commented','assignmentques');                    
+                    $output.='
+                    <div class="started">
+                        <h4>'.get_string('assessorfeedback','assignmentques').' '. $feedcount .'</h4>                       
+                        <div class="contectarea">
+                            <p>'.$data->value.'</p>
+                        </div>
+                    </div>
+                    <tr>
+                    <!--<td class="header c0" style="" scope="col">'.$step.'</td>
                     <td class="header c1" style="" scope="col">'.date("Y/m/d, h:i", $data->timecreated).'</td>
                     <td class="header c2" style="" scope="col">'.get_string('commented','assignmentques').': '.$data->value.'</td>
                     <td class="header c3" style="" scope="col">'.$stet.'</td>
-                    </tr>'; 
+                    </tr>-->'; 
                 }elseif($data->name=='answer'){
-                    $output.='<tr>
-                    <td class="header c0" style="" scope="col">'.$step.'</td>
-                    <td class="header c1" style="" scope="col">'.date("Y/m/d, h:i", $data->timecreated).'</td>
-                    <td class="header c2" style="" scope="col">'.get_string('saved','assignmentques').': '.$data->value.'</td>
-                    <td class="header c3" style="" scope="col">'.get_string('answersaved','assignmentques').'</td>
-                    </tr>'; 
+                    $answ++;
+                    $output.='
+                    <div class="started">
+                    <h4>'.get_string('learneranswer','assignmentques').' '. $answ .'</h4>                       
+                    <div class="contectarea">
+                        <p>'.$data->value.'</p>
+                    </div>
+                </div>'; 
                 }                  
             }    
         }
@@ -334,7 +336,7 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
             $prifix='q' . $uniqueid . ':' . $slot . '_';
             $output .= html_writer::start_tag('div',array(                
                 'id'    => 'goto_'.$slot,
-                'class' => 'quewrap collapsed'
+                'class' => 'quewrap adminsite collapsed'
             ));
             $output .='<a class="collapsedtoggel" href="#goto_'.$slot.'"><i class="fa fa-angle-down" aria-hidden="true"></i></a>';
             $output .= $attemptobj->render_question($slot, $reviewing, $this,
@@ -643,12 +645,14 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
         $output .= html_writer::start_tag('div');
 
         // Print all the questions.
+        $uniqueid=$attemptobj->get_attempt()->uniqueid;
         foreach ($slots as $slot) {
             $attemptid=$attemptobj->get_attemptid(); 
             $conditions = array('attempt'=>$attemptid,'slot'=>$slot);              
             $questionComment=$DB->get_records('assignmentques_comment', $conditions);            
             $disable='';
             $labl='';
+            
             if($questionComment){
                 if(
                     end($questionComment)->status=='passedtoiqa' or 
@@ -656,24 +660,34 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
                 ){
                     $disable='disable';
                     $labl='<label class="doneques">'.get_string(end($questionComment)->status,'assignmentques').'</label>';
+                }elseif(end($questionComment)->status){
+                    $disable='';
+                    $labl='<label class="needcorrection">'.get_string(end($questionComment)->status,'assignmentques').'</label>';
                 }else{
                     $disable='';
-                }              
-            }
+                }          
+            }          
             $output .= html_writer::start_tag('div',array(                                
                                 'id'    => 'goto_'.$slot,
-                                'class' => 'quewrap collapsed '.$disable
+                                'class' => 'quewrap usersite adminsite collapsed '.$disable
                             ));
             $output .='<a class="collapsedtoggel" href="#goto_'.$slot.'"><i class="fa fa-angle-down" aria-hidden="true"></i></a>';  
             $output .=  $labl;
-            $output .= html_writer::link(new moodle_url('', array('returnurl'=>$slot)),
-                            'Submit',array(
-                                'class' => 'endtestlink btn btn-default',                               
-                                'style' => 'float:right;margin: 8px 50px 0 0;'
-                            ));
-                
+
+            $conditions = array('questionusageid'=>$uniqueid,'slot'=>$slot);              
+            $questh=$DB->get_record('question_attempts', $conditions);
+
+            $output.='<div class="qtextcustome">'.$questh->questionsummary.'</div>';
+            $output .=$this->responseHistory($attemptid,$slot);  
+            
             $output .= $attemptobj->render_question($slot, false, $this,
-                    $attemptobj->attempt_url($slot, $page), $this);  
+            $attemptobj->attempt_url($slot, $page), $this);
+            $output .= html_writer::link(new moodle_url('', array('returnurl'=>$slot)),
+            'Submit',array(
+                'class' => 'endtestlink btn btn-default',                               
+                'style' => 'margin:8px 50px 0 6px;'
+            )); 
+
             $output .= html_writer::end_tag('div');         
         }
 

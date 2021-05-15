@@ -1262,12 +1262,23 @@ table#categoryquestions {
 .quewrap{
     position: relative;
     height: auto;
-    background: #ddd; padding: 5px;margin-bottom: 30px;
+    background: #e8e9eb; 
+    padding: 5px;
+    margin-bottom: 10px;
 }
-.quewrap.collapsed{
-    height:48px;
+.quewrap.collapsed{    
     overflow: hidden;
-    border-bottom: 7px solid #ddd;
+    border-bottom: 0px solid #ddd;
+}
+.quewrap.collapsed .ablock{
+    visibility: hidden;
+    height: 0;
+}
+.quewrap.collapsed #manualgradingform{
+    display: none;
+}
+.quewrap.collapsed .responsehistory{
+    display: none;
 }
 .quewrap.collapsed .endtestlink.btn.btn-default{
     display: none;
@@ -1301,22 +1312,104 @@ table#categoryquestions {
     align-items: center;
     justify-content: center;
 }
+.quewrap .needcorrection,.quewrap .needcorrectioniqa{
+    position: absolute;
+    right: 12px;
+    font-weight: 800;
+    color: red;
+}
 .quewrap .history{
     display: none;
 }
+.quewrap .autolink{
+    color: #555571;
+    cursor: auto;
+    pointer-events: none;
+}
 .quewrap .responsehistory{
     min-height: 20px;
-    padding: 19px;
+    padding: 0;
     margin-bottom: 20px;
-    background-color: #f5f5f5;
-    border: 1px solid #e3e3e3;
+    background-color: #e8e9eb;
+    border: 0px solid #dddddd;
     border-radius: 4px;
-    box-shadow: inset 0 1px 1px rgb(0 0 0 / 5%);
-    border-color: #e3e3e3;
+    border-color: #dddddd;
+}
+.quewrap.collapsed .commentedques{
+    display: none;
 }
 .quewrap .commentedques{
     float: right;
     margin: 15px 20px 0 0px;
+}
+
+.quewrap.adminsite .info{
+    display: none;
+}
+
+.quewrap.adminsite .ablock{
+    display: none;
+}
+.quewrap.adminsite  .que .formulation{
+    background: #e8e9eb;
+    border: medium none;
+    border-radius: 0;
+    color: #555;
+    padding: 7px;
+    text-shadow: none;
+    font-weight: 800;
+    margin: 0;
+}
+.quewrap.adminsite.collapsed .que .formulation{
+    background: #98fb98;
+}
+.quewrap.adminsite  .qtext,.quewrap.adminsite  .que{
+    margin: 0;
+}
+.quewrap.adminsite .notstarted,.quewrap.adminsite .started{
+    margin: 0 15px;
+}
+.quewrap.adminsite .contectarea{
+    padding: 8px;
+    background: #fff;
+    border: 1px solid #a7a7a7;
+    min-height: 100px;
+}
+.quewrap.adminsite.collapsed .que .info{
+    background: #98fb98;
+}
+
+.quewrap.usersite.collapsed{
+
+}
+.quewrap.usersite .qtextcustome{
+   
+    font-size: 16px;
+    font-weight: 800;
+    padding: 5px 0px 0 5px;
+}
+.quewrap.usersite.collapsed .qtextcustome{
+    background: #98fb98;
+}
+.quewrap.usersite .info {
+    display: none;
+}
+.quewrap.usersite .formulation{
+    background: #e8e9eb;
+}
+.quewrap.usersite.collapsed .formulation{
+    background: #98fb98;
+}
+
+.quewrap.adminsite.usersite .ablock{
+    display: inherit;
+    margin-top: 30px;
+}
+.quewrap.usersite .qtext{
+    display: none;
+}
+.quewrap.usersite.collapsed .ablock{
+    margin-top: 0px;
 }
 .commentlink select{
     margin: 8px;
