@@ -84,6 +84,14 @@ $summarydata['questionname'] = array(
 // Process any data that was submitted.
 if (data_submitted() && confirm_sesskey()) {
     if($forcecomment){
+        $course = $attemptobj->get_course();
+        $cm =  $attemptobj->get_cm();
+        $attempt = $attemptobj->get_attempt();
+        $context = context_module::instance($cm->id);
+        $assignmentques = $attemptobj->get_assignmentques();
+        $assignmentquesid = $assignmentques->id;       
+        $notiboj = assignmentques_send_notification_messages($course, $assignmentques, $attempt, $context, $cm);
+       
         $commentTime=time();
         $uniqueid=$attemptobj->get_attempt()->uniqueid;
         $slotNumber=$slot;
