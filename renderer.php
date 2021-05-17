@@ -170,7 +170,8 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
     }
     /*******Custome Comment Form******/
     public function customeComment($questionComment,$attemptobj,$slot,$prifix){
-        global $CFG,$DB;
+        global $CFG,$DB,$USER,$COURSE;        
+        $context = get_context_instance(CONTEXT_COURSE, $COURSE->id);
         $output='';
         $labl='';
             if($questionComment){
@@ -219,7 +220,10 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
                 </fieldset>';
             $output .='</form>';            
             $output .= html_writer::end_tag('div');
-            return $output;
+            if (has_capability('moodle/course:update', $context)) {
+                return $output;
+            }            
+            return '';
     }
     /*******Custome Comment end******/
     /*******Response history******/
@@ -272,14 +276,14 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
                     $status=$questionComment->status;                   
                 }
                 if($data->name==''){
-                    $answ++;
+                    /*$answ++;
                     $output.='
                     <div class="notstarted">
                         <h4>'.get_string('learneranswer','assignmentques').' '. $answ .'</h4>                       
                         <div class="contectarea">
                          <p>'.get_string('notyetanswered','assignmentques').'</p>
                         </div>
-                    </div>';
+                    </div>';*/
                 }elseif($data->name=='-comment'){
                     $feedcount++;
                     $stet=!empty($status)?get_string($status,'assignmentques'):get_string('commented','assignmentques');                    
@@ -341,8 +345,9 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
             $output .='<a class="collapsedtoggel" href="#goto_'.$slot.'"><i class="fa fa-angle-down" aria-hidden="true"></i></a>';
             $output .= $attemptobj->render_question($slot, $reviewing, $this,
                     $attemptobj->review_url($slot, $page, $showall));            
-            $output .=$this->responseHistory($attemptid,$slot);
-            $output .=$this->customeComment($questionComment,$attemptobj,$slot,$prifix);           
+            $output .=$this->responseHistory($attemptid,$slot);            
+            $output .=$this->customeComment($questionComment,$attemptobj,$slot,$prifix); 
+
             $output .= html_writer::end_tag('div');
         }
         return $output;

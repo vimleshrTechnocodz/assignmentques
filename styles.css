@@ -1241,15 +1241,20 @@ table#categoryquestions {
 .path-mod-assignmentques #mod_assignmentques_navblock .qnbutton.complete .trafficlight, .path-mod-assignmentques #mod_assignmentques_navblock .qnbutton.answersaved .trafficlight, .path-mod-assignmentques #mod_assignmentques_navblock .qnbutton.requiresgrading .trafficlight {
     background-color: #999;
 }
-.path-mod-assignmentques #mod_assignmentques_navblock .qnbutton .trafficlight {
-    border: 0;
+.path-mod-assignmentques #mod_assignmentques_navblock .qnbutton .trafficlight {    
     background: #fff none center / 10px no-repeat scroll;
     height: 20px;
     margin-top: 20px;
     border-radius: 0 0 3px 3px;
+    border: 1px solid #222;
+    border-top:0 ;
 }
 .path-mod-assignmentques #mod_assignmentques_navblock .qnbutton.notanswered .trafficlight, .path-mod-assignmentques #mod_assignmentques_navblock .qnbutton.incorrect .trafficlight {
     background-color: #b94a48;
+}
+
+.quewrap .content .comment{
+    display: none;
 }
 .quewrap .collapsedtoggel{
     position: absolute;
@@ -1411,15 +1416,18 @@ table#categoryquestions {
 .quewrap.usersite.collapsed .ablock{
     margin-top: 0px;
 }
-.commentlink select{
+.quewrap .commentlink{
+    display: block;
+}
+.quewrap .commentlink select{
     margin: 8px;
     height: 30px;
 }
-.commentlink textarea{
+.quewrap .commentlink textarea{
     width: 94%;
     margin: 8px;
 }
-.commentlink .felement.fsubmit{
+.quewrap .commentlink .felement.fsubmit{
     margin: 0px !important;
 }
 /** Print formatting for attempt and review pages **/
