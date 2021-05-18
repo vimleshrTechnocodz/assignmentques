@@ -1268,8 +1268,8 @@ table#categoryquestions {
     position: relative;
     height: auto;
     background: #e8e9eb; 
-    padding: 5px;
-    margin-bottom: 10px;
+    padding: 1px;
+    margin-bottom: 1px;
 }
 .quewrap.collapsed{    
     overflow: hidden;
@@ -1378,7 +1378,7 @@ table#categoryquestions {
     padding: 8px;
     background: #fff;
     border: 1px solid #a7a7a7;
-    min-height: 100px;
+    height: auto;
 }
 .quewrap.adminsite.collapsed .que .info{
     background: #98fb98;

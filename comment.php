@@ -86,12 +86,19 @@ if (data_submitted() && confirm_sesskey()) {
     if($forcecomment){
         $course = $attemptobj->get_course();
         $cm =  $attemptobj->get_cm();
-        $attempt = $attemptobj->get_attempt();
-        $context = context_module::instance($cm->id);
+        $attempt = $attemptobj->get_attempt();        
         $assignmentques = $attemptobj->get_assignmentques();
-        $assignmentquesid = $assignmentques->id;       
-        $notiboj = assignmentques_send_notification_messages($course, $assignmentques, $attempt, $context, $cm);
-       
+        $assignmentquesid = $assignmentques->id;  
+        $a->courseid=$course->id;
+        $a->assignmentquesreviewurl = $CFG->wwwroot . '/mod/assignmentques/attempt.php?attempt=' . $attempt->id.'&cmid='.$cm->id;
+        $a->assignmentquesname=$assignmentques->name;
+        $a->assignmentquescmid=$cm->id;
+        $a->assignmentquesid=$assignmentquesid;
+        $a->attemptid=$attempt->id; 
+        $recipient = \core_user::get_user($attemptobj->get_userid());
+        $notiCheck = assignmentques_send_confirmation($recipient, $a);
+        //print_r($notiCheck);
+        //return;    
         $commentTime=time();
         $uniqueid=$attemptobj->get_attempt()->uniqueid;
         $slotNumber=$slot;
