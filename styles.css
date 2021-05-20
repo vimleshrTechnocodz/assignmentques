@@ -1252,7 +1252,9 @@ table#categoryquestions {
 .path-mod-assignmentques #mod_assignmentques_navblock .qnbutton.notanswered .trafficlight, .path-mod-assignmentques #mod_assignmentques_navblock .qnbutton.incorrect .trafficlight {
     background-color: #b94a48;
 }
-
+.submithide{
+    display: none;
+}
 .quewrap .content .comment{
     display: none;
 }
@@ -1430,15 +1432,17 @@ table#categoryquestions {
 .quewrap .commentlink .felement.fsubmit{
     margin: 0px !important;
 }
+.assignmentquestb{
+    width: 100% !important;
+    overflow: hidden;
+    background: #f2f2f2;
+    border: 1px solid #ddd;
+}
 .assignmentquestb td{
     position: relative;
+    border-color: #d0cece;
 }
-.assignmentquestb td a{
-    pointer-events: none;
-}
-.assignmentquestb td.bold a{
-    pointer-events: auto !important;
-}
+
 .reportcol{
     position: absolute;
     left: 0;

@@ -349,8 +349,11 @@ class assignmentques_overview_table extends assignmentques_attempts_report_table
             $grade = html_writer::tag('del', $oldgrade) . '/' .
                     html_writer::empty_tag('br') . $newgrade;
         }
-
-        return $this->make_review_link($grade, $attempt, $slot);
+        
+        return html_writer::link(new moodle_url('/mod/assignmentques/review.php',
+                array('attempt' => $attempt->attempt)), $grade,
+                array('title' =>''));
+        //return $this->make_review_link($grade, $attempt, $slot);
     }
 
     public function col_regraded($attempt) {

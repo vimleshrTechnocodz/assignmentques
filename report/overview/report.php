@@ -187,15 +187,17 @@ class assignmentques_overview_report extends assignmentques_attempts_report {
                 foreach ($questions as $slot => $question) {
                     // Ignore questions of zero length.
                     $columns[] = 'qsgrade' . $slot;
-                    $header = get_string('qbrief', 'assignmentques', $question->number);
+                    $header = $question->number;
                     if (!$table->is_downloading()) {
-                        $header .= '<br />';
+                        //$header .= '<br />';
                     } else {
                         $header .= ' ';
                     }
-                    $header .= '/' . assignmentques_rescale_grade($question->maxmark, $assignmentques, 'question');
+                    //$header .= '/' . assignmentques_rescale_grade($question->maxmark, $assignmentques, 'question');
                     $headers[] = $header;
                 }
+                //$headers[] = 'Progress';              
+                //$columns[] = 'progress';
             }
 
             $this->set_up_table_columns($table, $columns, $headers, $this->get_base_url(), $options, false);

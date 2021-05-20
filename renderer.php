@@ -172,6 +172,19 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
     public function customeComment($questionComment,$attemptobj,$slot,$prifix){
         global $CFG,$DB,$USER,$COURSE;        
         $context = get_context_instance(CONTEXT_COURSE, $COURSE->id);
+        $roles = get_user_roles($context, $USER->id);   
+        $role=current($roles);
+        $selectArr=array();
+        if($role->roleid==3 or $role->roleid==4){
+            $selectArr['needcorrection']=get_string('needcorrection', 'assignmentques');
+            $selectArr['passedtoiqa']=get_string('passedtoiqa', 'assignmentques');
+            
+        }
+        if($role->roleid==1){
+            $selectArr['needcorrectioniqa']=get_string('needcorrectioniqa', 'assignmentques');
+            $selectArr['iqaagreeonpass']=get_string('iqaagreeonpass', 'assignmentques');
+           
+        }
         $output='';
         $labl='';
             if($questionComment){
@@ -195,12 +208,7 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
                         <input type="hidden" name="forcecomment" value="1"/>
                     </div>';           
             $output.= html_writer::select(
-                    array(
-                            'needcorrection' => get_string('needcorrection', 'assignmentques'), 
-                            'passedtoiqa' => get_string('passedtoiqa', 'assignmentques'), 
-                            'needcorrectioniqa' => get_string('needcorrectioniqa', 'assignmentques'), 
-                            'iqaagreeonpass' => get_string('iqaagreeonpass', 'assignmentques'), 
-                    ), 
+                     $selectArr, 
                     'status', 0);            
             $output.= html_writer::start_tag('textarea',array(               
                 'id'    => $prifix.'-comment_id',
@@ -651,14 +659,17 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
 
         // Print all the questions.
         $uniqueid=$attemptobj->get_attempt()->uniqueid;
+        $allfinish=0;
         foreach ($slots as $slot) {
             $attemptid=$attemptobj->get_attemptid(); 
             $conditions = array('attempt'=>$attemptid,'slot'=>$slot);              
             $questionComment=$DB->get_records('assignmentques_comment', $conditions);            
             $disable='';
-            $labl='';
-            
+            $labl='';        
             if($questionComment){
+                if(end($questionComment)->status=='iqaagreeonpass'){
+                   $allfinish++; 
+                }
                 if(
                     end($questionComment)->status=='passedtoiqa' or 
                     end($questionComment)->status=='iqaagreeonpass'
@@ -687,6 +698,7 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
             
             $output .= $attemptobj->render_question($slot, false, $this,
             $attemptobj->attempt_url($slot, $page), $this);
+
             $output .= html_writer::link(new moodle_url('', array('returnurl'=>$slot)),
             'Submit',array(
                 'class' => 'endtestlink btn btn-default',                               
@@ -695,10 +707,13 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
 
             $output .= html_writer::end_tag('div');         
         }
-
+        if($allfinish!=count($slots)){
+            $submithide='submithide';
+        }
+        $output .='<div class="'.$submithide.'">';
         $navmethod = $attemptobj->get_assignmentques()->navmethod;
         $output .= $this->attempt_navigation_buttons($page, $attemptobj->is_last_page($page), $navmethod);
-
+        $output .='<div>';
         // Some hidden fields to trach what is going on.
         $output .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'attempt',
                 'value' => $attemptobj->get_attemptid()));

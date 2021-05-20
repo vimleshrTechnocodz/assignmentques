@@ -48,6 +48,8 @@ $cmid          = optional_param('cmid', null, PARAM_INT);
 
 $attemptobj = assignmentques_create_attempt_handling_errors($attemptid, $cmid);
 
+
+
 // Set $nexturl now.
 if ($next) {
     $page = $nextpage;
@@ -64,7 +66,6 @@ if ($page == -1) {
         $nexturl->param('scrollpos', $scrollpos);
     }
 }
-
 // Check login.
 require_login($attemptobj->get_course(), false, $attemptobj->get_cm());
 require_sesskey();
@@ -108,15 +109,31 @@ if($status=='inprogress'){
     $conditions = array('attempt'=>$attempt->id,'slot'=>$slot);
     $questionrecipients=$DB->get_records('assignmentques_comment', $conditions);
     $usercheker=array();
-    foreach($questionrecipients as $questionrecipient){
-        if(in_array($questionrecipient->userid, $usercheker) == false){
-            $usercheker[]=$questionrecipient->userid;
-            $recipient = \core_user::get_user($questionrecipient->userid);
-            $notiCheck = assignmentques_send_confirmation($recipient, $a);
+    if($questionrecipients){
+        foreach($questionrecipients as $questionrecipient){
+            if(in_array($questionrecipient->userid, $usercheker) == false){
+                $usercheker[]=$questionrecipient->userid;
+                $recipient = \core_user::get_user($questionrecipient->userid);
+                $notiCheck = assignmentques_send_confirmation($recipient, $a);
+            }            
         }
+    }else{
+        // $role = $DB->get_record('role', array('shortname' => 'editingteacher'));
+        // $context = get_context_instance(CONTEXT_COURSE, $course->id);
+        // $teachers = get_role_users($role->id, $context);
+
+        $conditions=array('assignmentquesid'=>$assignmentquesid,'slot'=>$slot);
+        $assignmentquesslots=$DB->get_record('assignmentques_slots',$conditions);
         
+        if($assignmentquesslots){
+            $conditions=array('id'=>$assignmentquesslots->questionid);
+            $question=$DB->get_record('question',$conditions);
+            if($question){
+                $recipient = \core_user::get_user($question->createdby);
+                $notiCheck = assignmentques_send_confirmation($recipient, $a);
+            }
+        }
     }
-        
 }
 if ($status == assignmentques_attempt::OVERDUE) {
     redirect($attemptobj->summary_url());

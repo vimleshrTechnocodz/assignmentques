@@ -99,9 +99,69 @@ if (data_submitted() && confirm_sesskey()) {
         $a->coursename=$course->fullname; 
         $a->submissiontime=date('Y-m-d h:i:s'); 
         $a->assignmentquesurl=$a->assignmentquesreviewurl; 
-        $a->fullmessagehtml='<p>Please check feedback of '.$course->fullname.', question no. '.$slot.' <a href="'.$a->assignmentquesreviewurl.'">'.$assignmentques->name.'</a></p>';
-        $recipient = \core_user::get_user($attemptobj->get_userid());
-        $notiCheck = assignmentques_send_confirmation($recipient, $a);
+        $context = get_context_instance(CONTEXT_COURSE,$course->id);
+        $roles = get_user_roles($context, $USER->id);  
+        if($status=='needcorrection'){
+            $a->fullmessagehtml='<p>
+            <strong>Question Status: </strong>'.get_string('needcorrection','assignmentques').'<br/>
+            Feedback by teacher for '.$course->fullname.', question no. '.$slot.' <a href="'.$a->assignmentquesreviewurl.'">'.$assignmentques->name.'</a></p>';
+            $recipient = \core_user::get_user($attemptobj->get_userid());
+            $notiCheck = assignmentques_send_confirmation($recipient, $a);
+        }elseif($status=='passedtoiqa'){            
+            $a->fullmessagehtml='<p>
+            <strong>Question Status: </strong>'.get_string('passedtoiqa','assignmentques').'<br/>
+            Feedback by teacher for '.$course->fullname.', question no. '.$slot.' <a href="'.$a->assignmentquesreviewurl.'">'.$assignmentques->name.'</a></p>';
+            $recipient = \core_user::get_user($attemptobj->get_userid());
+            $notiCheck = assignmentques_send_confirmation($recipient, $a);
+            $role=current($roles);
+            if($role->roleid==3 or $role->roleid==4){
+                $rolcon = array('roleid'=>1,'contextid'=>$context->id);
+                $roleusers = $DB->get_records('role_assignments', $rolcon);               
+                foreach($roleusers as $roleuser){
+                    $recipient = \core_user::get_user($roleuser->userid);
+                    assignmentques_send_confirmation($recipient, $a);
+                }
+            }
+        }elseif($status=='needcorrectioniqa'){
+            $a->fullmessagehtml='<p>
+            <strong>Question Status: </strong>'.get_string('needcorrectioniqa','assignmentques').'<br/>
+            Feedback by IQA of '.$course->fullname.', question no. '.$slot.' <a href="'.$a->assignmentquesreviewurl.'">'.$assignmentques->name.'</a></p>';
+            
+            $commentcon = array('attempt'=>$attempt->id,'slot'=>$slot);            
+            $teachers = $DB->get_records('assignmentques_comment', $commentcon);
+            
+            $recipient = \core_user::get_user($attemptobj->get_userid());
+            assignmentques_send_confirmation($recipient, $a);
+
+            $usercheker=array();
+            foreach($teachers as $teacher){
+                if($teacher->userid!=$USER->id and in_array($teacher->userid, $usercheker) == false){
+                    $usercheker[]=$teacher->userid;
+                    $teacherNoti = \core_user::get_user($teacher->userid); 
+                    assignmentques_send_confirmation($teacherNoti, $a);
+                }                
+            }
+        }elseif($status=='iqaagreeonpass'){
+            $a->fullmessagehtml='<p>
+            <strong>Question Status: </strong>'.get_string('iqaagreeonpass','assignmentques').'<br/>
+            Feedback by IQA of '.$course->fullname.', question no. '.$slot.' <a href="'.$a->assignmentquesreviewurl.'">'.$assignmentques->name.'</a></p>';
+            
+            $commentcon = array('attempt'=>$attempt->id,'slot'=>$slot);            
+            $teachers = $DB->get_records('assignmentques_comment', $commentcon);
+            
+            $recipient = \core_user::get_user($attemptobj->get_userid());
+            assignmentques_send_confirmation($recipient, $a);
+
+            $usercheker=array();
+            foreach($teachers as $teacher){
+                if($teacher->userid!=$USER->id and in_array($teacher->userid, $usercheker) == false){
+                    $usercheker[]=$teacher->userid;
+                    $teacherNoti = \core_user::get_user($teacher->userid); 
+                    assignmentques_send_confirmation($teacherNoti, $a);
+                }                
+            }
+        }
+        
         //print_r($notiCheck);
         //return;    
         $commentTime=time();
