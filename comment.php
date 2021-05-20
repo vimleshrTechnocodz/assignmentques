@@ -95,6 +95,11 @@ if (data_submitted() && confirm_sesskey()) {
         $a->assignmentquescmid=$cm->id;
         $a->assignmentquesid=$assignmentquesid;
         $a->attemptid=$attempt->id; 
+
+        $a->coursename=$course->fullname; 
+        $a->submissiontime=date('Y-m-d h:i:s'); 
+        $a->assignmentquesurl=$a->assignmentquesreviewurl; 
+        $a->fullmessagehtml='<p>Please check feedback of '.$course->fullname.', question no. '.$slot.' <a href="'.$a->assignmentquesreviewurl.'">'.$assignmentques->name.'</a></p>';
         $recipient = \core_user::get_user($attemptobj->get_userid());
         $notiCheck = assignmentques_send_confirmation($recipient, $a);
         //print_r($notiCheck);

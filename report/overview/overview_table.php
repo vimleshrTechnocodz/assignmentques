@@ -149,8 +149,8 @@ class assignmentques_overview_table extends assignmentques_attempts_report_table
      * @param \core\dml\sql_join $usersjoins (joins, wheres, params) for the users to average over.
      */
     protected function add_average_row($label, \core\dml\sql_join $usersjoins) {
-        $averagerow = $this->compute_average_row($label, $usersjoins);
-        $this->add_data_keyed($averagerow);
+        //$averagerow = $this->compute_average_row($label, $usersjoins);
+        //$this->add_data_keyed($averagerow);
     }
 
     /**
@@ -255,6 +255,40 @@ class assignmentques_overview_table extends assignmentques_attempts_report_table
                 array('title' => get_string('reviewattempt', 'assignmentques')));
     }
 
+    /***Get comment status* */
+    function get_comment_status($questionAttempt,$step){
+        $grade='';
+        if($questionAttempt){    
+            if(!empty($questionAttempt->status)){
+                $showcolors = get_config('block_quescolorsetting',$questionAttempt->status);
+                $grade = '<span class="reportcol '.$questionAttempt->status.'" 
+                    style="background:'.$showcolors.'"
+                    title="'.get_string($questionAttempt->status,'assignmentques').'" 
+                    > </span>';
+            }else{
+                $showcolors = get_config('block_quescolorsetting','completecolor');
+                $grade = '<span class="reportcol '.$questionAttempt->status.'" 
+                    style="background:'.$showcolors.'"
+                    title="'.get_string('attempted','block_quescolorsetting').'" 
+                    > </span>'; 
+            }
+        }else{                  
+            if($step->state!='todo'){                
+                $showcolors = get_config('block_quescolorsetting','completecolor');
+                $grade = '<span class="reportcol" 
+                style="background:'.$showcolors.'"
+                title="'.get_string('attempted','block_quescolorsetting').'" 
+                > </span>';
+            }else{
+                $showcolors = get_config('block_quescolorsetting','notcompletecolor');
+                $grade = '<span class="reportcol" 
+                style="background:'.$showcolors.'"
+                title="'.get_string('notattempted','block_quescolorsetting').'" 
+                > </span>';
+            }
+        }
+        return $grade;
+    }
     /**
      * @param string $colname the name of the column.
      * @param object $attempt the row of data - see the SQL in display() in
@@ -263,10 +297,19 @@ class assignmentques_overview_table extends assignmentques_attempts_report_table
      * @return string the contents of the cell.
      */
     public function other_cols($colname, $attempt) {
+        global $DB;
         if (!preg_match('/^qsgrade(\d+)$/', $colname, $matches)) {
             return null;
         }
         $slot = $matches[1];
+        $commentcon = array('attempt'=>$attempt->attempt,'slot'=>$slot);
+        $questionAttempt=end($DB->get_records('assignmentques_comment', $commentcon));
+
+        $commentcon=array('questionusageid'=>$attempt->usageid,'slot'=>$slot);
+		$quesattempt=end($DB->get_records('question_attempts', $commentcon));
+
+        $commentcon=array('questionattemptid'=>$quesattempt->id);
+		$step =end($DB->get_records('question_attempt_steps', $commentcon));
 
         $question = $this->questions[$slot];
         if (!isset($this->lateststeps[$attempt->usageid][$slot])) {
@@ -280,9 +323,10 @@ class assignmentques_overview_table extends assignmentques_attempts_report_table
             $grade = '-';
         } else if (is_null($stepdata->fraction)) {
             if ($state == question_state::$needsgrading) {
-                $grade = get_string('requiresgrading', 'question');
-            } else {
-                $grade = '-';
+                //$grade = get_string('requiresgrading', 'question');
+                $grade = $this->get_comment_status($questionAttempt,$step);
+            } else {                
+                $grade = $this->get_comment_status($questionAttempt,$step);
             }
         } else {
             $grade = assignmentques_rescale_grade(

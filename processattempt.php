@@ -87,7 +87,37 @@ if ($attemptobj->is_finished()) {
 
 // Process the attempt, getting the new status for the attempt.
 $status = $attemptobj->process_attempt($timenow, $finishattempt, $timeup, $thispage);
-
+if($status=='inprogress'){
+    $slot = $thispage;
+    $course = $attemptobj->get_course();
+    $cm =  $attemptobj->get_cm();
+    $attempt = $attemptobj->get_attempt();        
+    $assignmentques = $attemptobj->get_assignmentques();
+    $assignmentquesid = $assignmentques->id;  
+    $a->courseid=$course->id;
+    $a->assignmentquesreviewurl = $CFG->wwwroot . '/mod/assignmentques/review.php?attempt=' . $attempt->id;
+    $a->assignmentquesname=$assignmentques->name;
+    $a->assignmentquescmid=$cm->id;
+    $a->assignmentquesid=$assignmentquesid;
+    $a->attemptid=$attempt->id;
+    $a->coursename=$course->fullname; 
+    $a->submissiontime=date('Y-m-d h:i:s'); 
+    $a->assignmentquesurl=$a->assignmentquesreviewurl; 
+    $a->fullmessagehtml='<p>Student updated question No. '.$slot.' '.$course->fullname.', <a href="'.$a->assignmentquesreviewurl.'">'.$assignmentques->name.'</a></p>';
+    $recipient = \core_user::get_user($attemptobj->get_userid());
+    $conditions = array('attempt'=>$attempt->id,'slot'=>$slot);
+    $questionrecipients=$DB->get_records('assignmentques_comment', $conditions);
+    $usercheker=array();
+    foreach($questionrecipients as $questionrecipient){
+        if(in_array($questionrecipient->userid, $usercheker) == false){
+            $usercheker[]=$questionrecipient->userid;
+            $recipient = \core_user::get_user($questionrecipient->userid);
+            $notiCheck = assignmentques_send_confirmation($recipient, $a);
+        }
+        
+    }
+        
+}
 if ($status == assignmentques_attempt::OVERDUE) {
     redirect($attemptobj->summary_url());
 } else if ($status == assignmentques_attempt::IN_PROGRESS) {

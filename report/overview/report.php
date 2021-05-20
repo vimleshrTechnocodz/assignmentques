@@ -173,9 +173,9 @@ class assignmentques_overview_report extends assignmentques_attempts_report {
 
             $this->add_user_columns($table, $columns, $headers);
             $this->add_state_column($columns, $headers);
-            $this->add_time_columns($columns, $headers);
+            //$this->add_time_columns($columns, $headers);
 
-            $this->add_grade_columns($assignmentques, $options->usercanseegrades, $columns, $headers, false);
+            //$this->add_grade_columns($assignmentques, $options->usercanseegrades, $columns, $headers, false);
 
             if (!$table->is_downloading() && has_capability('mod/assignmentques:regrade', $this->context) &&
                     $this->has_regraded_questions($table->sql->from, $table->sql->where, $table->sql->params)) {
@@ -199,7 +199,7 @@ class assignmentques_overview_report extends assignmentques_attempts_report {
             }
 
             $this->set_up_table_columns($table, $columns, $headers, $this->get_base_url(), $options, false);
-            $table->set_attribute('class', 'generaltable generalbox grades');
+            $table->set_attribute('class', 'generaltable generalbox grades assignmentquestb');
 
             $table->out($options->pagesize, true);
         }

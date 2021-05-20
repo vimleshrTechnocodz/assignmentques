@@ -1430,6 +1430,27 @@ table#categoryquestions {
 .quewrap .commentlink .felement.fsubmit{
     margin: 0px !important;
 }
+.assignmentquestb td{
+    position: relative;
+}
+.assignmentquestb td a{
+    pointer-events: none;
+}
+.assignmentquestb td.bold a{
+    pointer-events: auto !important;
+}
+.reportcol{
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #222;
+    margin: 1px;
+}
 /** Print formatting for attempt and review pages **/
 
 @media print {

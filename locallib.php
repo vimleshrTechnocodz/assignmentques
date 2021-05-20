@@ -1543,7 +1543,7 @@ function assignmentques_send_confirmation($recipient, $a) {
     $eventdata->subject           = get_string('emailconfirmsubject', 'assignmentques', $a);
     $eventdata->fullmessage       = get_string('emailconfirmbody', 'assignmentques', $a);
     $eventdata->fullmessageformat = FORMAT_PLAIN;
-    $eventdata->fullmessagehtml   = '';
+    $eventdata->fullmessagehtml   = !empty($a->fullmessagehtml)?$a->fullmessagehtml:'';
 
     $eventdata->smallmessage      = get_string('emailconfirmsmall', 'assignmentques', $a);
     $eventdata->contexturl        = $a->assignmentquesurl;
