@@ -140,11 +140,11 @@
     right: 0;
 }
 
-.path-mod-assignmentques .qnbutton.thispage {
+.path-mod-assignmentques .qnbutton {
     border-color: #666;
 }
 
-.path-mod-assignmentques .qnbutton.thispage .thispageholder {
+.path-mod-assignmentques .qnbutton .thispageholder {
     border: 1px solid #666;
 }
 
@@ -1219,7 +1219,7 @@ table#categoryquestions {
     list-style: none;
 }
 
-.path-mod-assignmentques .qnbutton.thispage{
+.path-mod-assignmentques .qnbutton{
     text-decoration: none;
     font-size: 14px;
     line-height: 20px;
@@ -1281,7 +1281,10 @@ table#categoryquestions {
     visibility: hidden;
     height: 0;
 }
-.quewrap.collapsed #manualgradingform{
+.quewrap .manualgradingform{
+    position: relative;
+}
+.quewrap.collapsed .manualgradingform{
     display: none;
 }
 .quewrap.collapsed .responsehistory{
@@ -1431,6 +1434,54 @@ table#categoryquestions {
 }
 .quewrap .commentlink .felement.fsubmit{
     margin: 0px !important;
+}
+.loading.hideload{
+    display: none;
+}
+.loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: #22222282;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.loading span {
+    position: relative;
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    background-color: #99cc33;
+    border-radius: 50%;
+    margin: 6px;
+    box-shadow: 0 0 5px 0.5px #ff6633;
+    transition: animation .5s;
+}
+.loading span:nth-child(1) { 
+    animation: zoom 1s ease-in-out infinite;
+}
+.loading span:nth-child(2) {
+    animation: zoom 1s ease-in-out .5s infinite;
+}
+.loading span:nth-child(3) {
+    animation: zoom 1s ease-in-out 1s infinite;
+}
+.loading span:nth-child(4) {
+    animation: zoom 1s ease-in-out 1.5s infinite;
+}
+.loading span:nth-child(5) {
+    animation: zoom 1s ease-in-out 2s infinite;
+}
+@keyframes zoom {
+   0%, 100% {  
+        transform: scale(1.0);
+      } 50% {
+        transform: scale(1.8);
+        box-shadow: 0 0 24px 1px #ff4d4d;   
+    }
 }
 .assignmentquestb{
     width: 100% !important;

@@ -58,7 +58,7 @@ if ($attemptobj->get_userid() != $USER->id) {
 }
 
 // Check capabilities and block settings.
-if (!$attemptobj->is_preview_user()) {
+if ($attemptobj->is_preview_user()) {
     $attemptobj->require_capability('mod/assignmentques:attempt');
     if (empty($attemptobj->get_assignmentques()->showblocks)) {
         $PAGE->blocks->show_only_fake_blocks();

@@ -54,6 +54,7 @@ $PAGE->set_title(get_string('manualgradequestion', 'assignmentques', array(
         'assignmentques' => format_string($attemptobj->get_assignmentques_name()), 'user' => fullname($student))));
 $PAGE->set_heading($attemptobj->get_course()->fullname);
 $output = $PAGE->get_renderer('mod_assignmentques');
+if(!$forcecomment)
 echo $output->header();
 
 // Prepare summary information about this question attempt.
@@ -196,19 +197,19 @@ if (data_submitted() && confirm_sesskey()) {
                     $assignmentques_comment->status = $status;
                     $insCommentDataId = $DB->insert_record('assignmentques_comment', $assignmentques_comment);
                     if($insCommentDataId){
-                        redirect($CFG->wwwroot.'/mod/assignmentques/review.php?attempt='.$attemptobj->get_attemptid(), get_string('changessaved'), null, \core\output\notification::NOTIFY_SUCCESS);
+                        echo 1;
                     }else{
-                        redirect($CFG->wwwroot.'/mod/assignmentques/review.php?attempt='.$attemptobj->get_attemptid(), get_string('notchangessaved'), null, \core\output\notification::NOTIFY_ERROR);
+                        echo 0;
                     }
                 }
                 else{
-                    redirect($CFG->wwwroot.'/mod/assignmentques/review.php?attempt='.$attemptobj->get_attemptid(), get_string('notchangessaved'), null, \core\output\notification::NOTIFY_ERROR);
+                    echo 0;
                 }
             }else{
-                redirect($CFG->wwwroot.'/mod/assignmentques/review.php?attempt='.$attemptobj->get_attemptid(), get_string('notchangessaved'), null, \core\output\notification::NOTIFY_ERROR);
+                echo 0;
             }
         }else{
-            redirect($CFG->wwwroot.'/mod/assignmentques/review.php?attempt='.$attemptobj->get_attemptid(), get_string('notchangessaved'), null, \core\output\notification::NOTIFY_ERROR);
+            echo 0;
         }
         die;
     }else if (optional_param('submit', false, PARAM_BOOL) && question_engine::is_manual_grade_in_range($attemptobj->get_uniqueid(), $slot)) {

@@ -215,6 +215,35 @@ M.mod_assignmentques.nav.init = function(Y) {
             tggeldiv.toggleClass('collapsed');              
         }, '.collapsedtoggel');
     }
+    if (Y.one('.quewrap.adminsite .mform')) {
+        Y.on('submit', function(e) {
+            e.preventDefault();
+            // Form serialisation works best if we get the form using getElementById, for some reason
+            var form = document.getElementById(this._stateProxy.id);
+            var loading= Y.one('#loading_'+this._stateProxy.id);
+            loading.toggleClass('hideload');
+            // Send the request
+           Y.io(M.cfg.wwwroot+'/mod/assignmentques/comment.php', {
+                method: 'post',
+                on: {
+                    success: function(id, o) {
+                        response = o.responseText;
+                        console.log(response);
+                        loading.toggleClass('hideload');
+                        if(response==1){
+                            alert('Comment successful');
+                            location.reload();
+                        }else{
+                            alert("Comment not submitted please try again");
+                        }
+                        // Display some feedback to the user
+                    }
+                },
+                form: form,
+                context: this
+            });
+        }, '.quewrap.adminsite .mform');
+    }
 };
 
 M.mod_assignmentques.secure_window = {

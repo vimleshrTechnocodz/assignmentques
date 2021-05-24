@@ -190,9 +190,8 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
             if($questionComment){
                 $st=!empty(end($questionComment)->status)?get_string(end($questionComment)->status,'assignmentques'):get_string('commented','assignmentques');
                 $labl='<label class="commentedques">'.get_string('currantstatus','assignmentques').': <strong>'.$st.'</strong></label>';      
-            }
-            $output .=$labl;
-            $output .='<form method="post" class="mform" id="manualgradingform" action="' .
+            }            
+            $output .='<form method="post" class="mform manualgradingform" id="manualgradingform_'.$slot.'" action="' .
             $CFG->wwwroot . '/mod/assignmentques/comment.php">';            
             $output .= html_writer::start_tag('div',array(
                 'style'=>'background: #ddd; padding: 5px;',
@@ -209,7 +208,8 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
                     </div>';           
             $output.= html_writer::select(
                      $selectArr, 
-                    'status', 0);            
+                    'status', 0);     
+            $output .=$labl;       
             $output.= html_writer::start_tag('textarea',array(               
                 'id'    => $prifix.'-comment_id',
                 'class' => 'commentlink',
@@ -220,8 +220,15 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
                     <div>
                         <div class="fitem fitem_actionbuttons fitem_fsubmit">
                             <fieldset class="felement fsubmit">
-                                <input id="id_submitbutton" type="submit" name="submit" class="btn btn-primary" 
+                                <input type="submit" name="submit" class="btn btn-primary" 
                                 value="'.get_string('save', 'assignmentques').'"/>
+                                <div class="loading hideload" id="loading_manualgradingform_'.$slot.'">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
                             </fieldset>
                         </div>
                     </div>
@@ -660,10 +667,27 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
         // Print all the questions.
         $uniqueid=$attemptobj->get_attempt()->uniqueid;
         $allfinish=0;
+        $ii=0;
+        $disabled=false;
         foreach ($slots as $slot) {
-            $attemptid=$attemptobj->get_attemptid(); 
+            $attemptid=$attemptobj->get_attemptid();
+
+            if( $ii!=0){
+                $conditions=array('questionusageid'=>$uniqueid,'slot'=>($slot-1));
+                $quesattempt=end($DB->get_records('question_attempts', $conditions));
+    
+                $conditions=array('questionattemptid'=>$quesattempt->id);
+                $step=end($DB->get_records('question_attempt_steps', $conditions)); 
+                if($step->state=='todo')
+                $disabled = true;
+            }
+			$ii++;
+
             $conditions = array('attempt'=>$attemptid,'slot'=>$slot);              
-            $questionComment=$DB->get_records('assignmentques_comment', $conditions);            
+            $questionComment=$DB->get_records('assignmentques_comment', $conditions);  
+            
+            
+            
             $disable='';
             $labl='';        
             if($questionComment){
@@ -687,6 +711,7 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
                                 'id'    => 'goto_'.$slot,
                                 'class' => 'quewrap usersite adminsite collapsed '.$disable
                             ));
+            if(!$disabled)
             $output .='<a class="collapsedtoggel" href="#goto_'.$slot.'"><i class="fa fa-angle-down" aria-hidden="true"></i></a>';  
             $output .=  $labl;
 
