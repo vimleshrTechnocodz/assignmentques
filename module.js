@@ -216,19 +216,18 @@ M.mod_assignmentques.nav.init = function(Y) {
         }, '.collapsedtoggel');
     }
     if (Y.one('.quewrap.adminsite .mform')) {
-        Y.on('submit', function(e) {
-            e.preventDefault();
+       /*Y.on('submit', function(e) {
+            e.preventDefault();        
             // Form serialisation works best if we get the form using getElementById, for some reason
-            var form = document.getElementById(this._stateProxy.id);
+            var form = document.getElementById(this._stateProxy.id);                
             var loading= Y.one('#loading_'+this._stateProxy.id);
-            loading.toggleClass('hideload');
+            loading.toggleClass('hideload');           
             // Send the request
            Y.io(M.cfg.wwwroot+'/mod/assignmentques/comment.php', {
                 method: 'post',
                 on: {
                     success: function(id, o) {
-                        response = o.responseText;
-                        console.log(response);
+                        response = o.responseText;                       
                         loading.toggleClass('hideload');
                         if(response==1){
                             alert('Comment successful');
@@ -242,7 +241,7 @@ M.mod_assignmentques.nav.init = function(Y) {
                 form: form,
                 context: this
             });
-        }, '.quewrap.adminsite .mform');
+        }, '.quewrap.adminsite .mform');*/
     }
 };
 
@@ -322,3 +321,28 @@ M.mod_assignmentques.secure_window = {
         }, delay*1000);
     }
 };
+
+jQuery(function($) {
+    $(".quewrap.adminsite .mform").submit(function(e){
+        e.preventDefault();
+        var form = $(this);        
+        $.ajax({
+            type: 'post',
+            url: M.cfg.wwwroot+'/mod/assignmentques/comment.php',
+            data: form.serialize(),
+            beforeSend: function() {               
+               form.find(".loading").toggleClass('hideload');
+            },
+            success: function (data) {
+                if(data==1){
+                    alert('Comment successful');
+                    form.find(".loading").toggleClass('hideload');
+                    location.reload(true);
+                }else{
+                    form.find(".loading").hide();
+                    alert("Comment not submitted please try again");                    
+                }
+            }
+          });
+    });
+});
