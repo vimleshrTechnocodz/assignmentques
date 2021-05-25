@@ -337,7 +337,7 @@ jQuery(function($) {
                 if(data==1){
                     alert('Comment successful');
                     form.find(".loading").toggleClass('hideload');
-                    location.reload(true);
+                    location.reload();
                 }else{
                     form.find(".loading").hide();
                     alert("Comment not submitted please try again");                    
