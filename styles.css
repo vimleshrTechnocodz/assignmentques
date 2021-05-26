@@ -1290,7 +1290,7 @@ table#categoryquestions {
 .quewrap.collapsed .responsehistory{
     display: none;
 }
-.quewrap.collapsed .endtestlink.btn.btn-default{
+.quewrap.collapsed .endtestlinkajax.btn.btn-default{
     display: none;
 }
 .quewrap .readonly{
@@ -1305,7 +1305,7 @@ table#categoryquestions {
     bottom: 0;
     background: #2222225e;
 }
-.quewrap.disable .endtestlink{
+.quewrap.disable .endtestlinkajax{
     display: none;
 }
 .quewrap.disable .doneques{
@@ -1474,6 +1474,15 @@ table#categoryquestions {
 }
 .loading span:nth-child(5) {
     animation: zoom 1s ease-in-out 2s infinite;
+}
+.loading.loadstu{
+    position: fixed;
+    z-index: 9999;
+}
+.historydate{
+    font-weight: normal;
+    font-size: 12px;
+    float: right;
 }
 @keyframes zoom {
    0%, 100% {  

@@ -304,7 +304,7 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
                     $stet=!empty($status)?get_string($status,'assignmentques'):get_string('commented','assignmentques');                    
                     $output.='
                     <div class="started">
-                        <h4>'.get_string('assessorfeedback','assignmentques').' '. $feedcount .'</h4>                       
+                        <h4>'.get_string('assessorfeedback','assignmentques').' '. $feedcount .' <span class="historydate">'.date("Y/m/d, h:i", $data->timecreated).'</span></h4>                       
                         <div class="contectarea">
                             <p>'.$data->value.'</p>
                         </div>
@@ -319,7 +319,7 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
                     $answ++;
                     $output.='
                     <div class="started">
-                    <h4>'.get_string('learneranswer','assignmentques').' '. $answ .'</h4>                       
+                    <h4>'.get_string('learneranswer','assignmentques').' '. $answ .' <span class="historydate">'.date("Y/m/d, h:i", $data->timecreated).'</span></h4>                       
                     <div class="contectarea">
                         <p>'.$data->value.'</p>
                     </div>
@@ -661,9 +661,17 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
                 array('action' => new moodle_url($attemptobj->processattempt_url(),
                 array('cmid' => $attemptobj->get_cmid())), 'method' => 'post',
                 'enctype' => 'multipart/form-data', 'accept-charset' => 'utf-8',
-                'id' => 'responseform'));
+                'id' => 'responseform',
+                'class' => 'studentsubmit'
+            ));
         $output .= html_writer::start_tag('div');
-
+        $output .= '<div class="loading hideload loadstu">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>';
         // Print all the questions.
         $uniqueid=$attemptobj->get_attempt()->uniqueid;
         $allfinish=0;
@@ -726,7 +734,7 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
 
             $output .= html_writer::link(new moodle_url('', array('returnurl'=>$slot)),
             'Submit',array(
-                'class' => 'endtestlink btn btn-default',                               
+                'class' => 'endtestlinkajax btn btn-default',                               
                 'style' => 'margin:8px 50px 0 6px;'
             )); 
 

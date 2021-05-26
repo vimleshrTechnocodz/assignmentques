@@ -345,4 +345,28 @@ jQuery(function($) {
             }
           });
     });
+    $(".endtestlinkajax").click(function(e){
+        e.preventDefault();
+        var form = $(".studentsubmit"); 
+        var url = $(".studentsubmit").attr('action');
+        //console.log(url);return;
+        $.ajax({
+            type: 'post',
+            url: url,
+            data: form.serialize(),
+            beforeSend: function() {               
+               form.find(".loading").toggleClass('hideload');
+            },
+            success: function (data) {
+                if(data){
+                    alert('Save changed successfully');
+                    form.find(".loading").toggleClass('hideload');
+                    location.reload();
+                }else{
+                    form.find(".loading").hide();
+                    alert("Not save please try again");                    
+                }
+            }
+          });
+    });
 });
