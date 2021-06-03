@@ -1287,6 +1287,13 @@ table#categoryquestions {
 .quewrap.collapsed .manualgradingform{
     display: none;
 }
+.quewrap.collapsed .manualgradingform.finishbystu{
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 999
+}
 .quewrap.collapsed .responsehistory{
     display: none;
 }
@@ -1318,6 +1325,30 @@ table#categoryquestions {
     left: 0;
     bottom: 0;
     margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.quewrap  .current-status{
+    position: absolute;
+    right: 2px;
+    font-weight: 800;
+    color: rgb(0, 0, 0);
+    background: #fff;
+    padding: 0 12px;
+    border-radius: 10px;
+    top: 2px;
+}
+.current-status-quesfinish{
+    position: absolute;
+    right: 0;
+    font-weight: 800;
+    color: rgb(255 255 255);
+    background: #0000005e;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    margin: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1570,4 +1601,7 @@ table#categoryquestions {
     #page-mod-assignmentques-review .que {
         page-break-inside: avoid;
     }
+}
+.assignmentquessavegradesform.form-inline{
+    display: none;
 }

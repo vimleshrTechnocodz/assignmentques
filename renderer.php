@@ -169,7 +169,7 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
         return $output;
     }
     /*******Custome Comment Form******/
-    public function customeComment($questionComment,$attemptobj,$slot,$prifix){
+    public function customeComment($questionComment,$attemptobj,$slot,$prifix,$questionAttemptData=null){
         global $CFG,$DB,$USER,$COURSE;        
         $context = get_context_instance(CONTEXT_COURSE, $COURSE->id);
         $roles = get_user_roles($context, $USER->id);   
@@ -190,8 +190,11 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
             if($questionComment){
                 $st=!empty(end($questionComment)->status)?get_string(end($questionComment)->status,'assignmentques'):get_string('commented','assignmentques');
                 $labl='<label class="commentedques">'.get_string('currantstatus','assignmentques').': <strong>'.$st.'</strong></label>';      
+            }
+            if($questionAttemptData=='-finish'){
+                $finishClass='finishbystu';
             }            
-            $output .='<form method="post" class="mform manualgradingform" id="manualgradingform_'.$slot.'" action="' .
+            $output .='<form method="post" class="mform manualgradingform '.$finishClass.'" id="manualgradingform_'.$slot.'" action="' .
             $CFG->wwwroot . '/mod/assignmentques/comment.php">';            
             $output .= html_writer::start_tag('div',array(
                 'style'=>'background: #ddd; padding: 5px;',
@@ -205,23 +208,31 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
                         <input type="hidden" name="sesskey" value="'.sesskey().'" />
                         <input type="hidden" name="'.$prifix.'-commentformat" value="1">
                         <input type="hidden" name="forcecomment" value="1"/>
-                    </div>';           
-            $output.= html_writer::select(
-                     $selectArr, 
-                    'status', 0);     
-            $output .=$labl;       
-            $output.= html_writer::start_tag('textarea',array(               
-                'id'    => $prifix.'-comment_id',
-                'class' => 'commentlink',
-                'name' => 'commentdata'
-            ));            
+                    </div>';    
+            if($questionAttemptData!='-finish'){
+                $output.= html_writer::select(
+                    $selectArr, 
+                   'status', 0);  
+                $finishbtn = 'save';
+            }else{
+                $output.='<input type="hidden" name="mark" value="1"/>';
+                $finishbtn = 'finishbtn';
+            }  
+            $output .=$labl;    
+            if($questionAttemptData!='-finish'){   
+                $output.= html_writer::start_tag('textarea',array(               
+                    'id'    => $prifix.'-comment_id',
+                    'class' => 'commentlink',
+                    'name' => 'commentdata'
+                )); 
+            }           
             $output.= html_writer::end_tag('textarea');
             $output.='<fieldset class="hidden">
                     <div>
                         <div class="fitem fitem_actionbuttons fitem_fsubmit">
                             <fieldset class="felement fsubmit">
                                 <input type="submit" name="submit" class="btn btn-primary" 
-                                value="'.get_string('save', 'assignmentques').'"/>
+                                value="'.get_string($finishbtn, 'assignmentques').'"/>
                                 <div class="loading hideload" id="loading_manualgradingform_'.$slot.'">
                                     <span></span>
                                     <span></span>
@@ -281,7 +292,7 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
         $output.='<div class="responsehistory">
                 <!--<h4 class="responsehistoryheader">'.get_string('responsehistory','assignmentques').'</h4>-->
                ';
-        $answ=0;$feedcount=0;
+        $answ=0;$feedcount=0;$iqacount=0;
         foreach($history as $data){             
             if($data->name=='' or $data->name=='-comment' or $data->name=='answer'){  
                 $status='';
@@ -300,6 +311,116 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
                         </div>
                     </div>';*/
                 }elseif($data->name=='-comment'){
+                    if($status=='needcorrectioniqa' or $status=='iqaagreeonpass'){
+                        $iqacount++;
+                        $stet=!empty($status)?get_string($status,'assignmentques'):get_string('commented','assignmentques');                    
+                        $output.='
+                        <div class="started">
+                            <h4>'.get_string('iqafeedback','assignmentques').' '. $iqacount .' <span class="historydate">'.date("Y/m/d, h:i", $data->timecreated).'</span></h4>                       
+                            <div class="contectarea">
+                                <p>'.$data->value.'</p>
+                            </div>
+                        </div>
+                        <tr>
+                        <!--<td class="header c0" style="" scope="col">'.$step.'</td>
+                        <td class="header c1" style="" scope="col">'.date("Y/m/d, h:i", $data->timecreated).'</td>
+                        <td class="header c2" style="" scope="col">'.get_string('commented','assignmentques').': '.$data->value.'</td>
+                        <td class="header c3" style="" scope="col">'.$stet.'</td>
+                        </tr>-->'; 
+                    }elseif($status=='needcorrection' or $status=='passedtoiqa'){
+                        $feedcount++;
+                        $stet=!empty($status)?get_string($status,'assignmentques'):get_string('commented','assignmentques');                    
+                        $output.='
+                        <div class="started">
+                            <h4>'.get_string('assessorfeedback','assignmentques').' '. $feedcount .' <span class="historydate">'.date("Y/m/d, h:i", $data->timecreated).'</span></h4>                       
+                            <div class="contectarea">
+                                <p>'.$data->value.'</p>
+                            </div>
+                        </div>
+                        <tr>
+                        <!--<td class="header c0" style="" scope="col">'.$step.'</td>
+                        <td class="header c1" style="" scope="col">'.date("Y/m/d, h:i", $data->timecreated).'</td>
+                        <td class="header c2" style="" scope="col">'.get_string('commented','assignmentques').': '.$data->value.'</td>
+                        <td class="header c3" style="" scope="col">'.$stet.'</td>
+                        </tr>-->'; 
+                    }
+                    
+                }elseif($data->name=='answer'){
+                    $answ++;
+                    $output.='
+                    <div class="started">
+                    <h4>'.get_string('learneranswer','assignmentques').' '. $answ .' <span class="historydate">'.date("Y/m/d, h:i", $data->timecreated).'</span></h4>                       
+                    <div class="contectarea">
+                        <p>'.$data->value.'</p>
+                    </div>
+                </div>'; 
+                }                  
+            }    
+        }
+        $output.=    '</tbody>';
+        $output.=  '</table></div>';
+        return $output;
+        
+    }
+
+    public function responseHistoryForStu($attemptid,$slot){
+        /*******Get history table table********/
+        global $CFG,$DB;
+        $output='';
+        $sql="SELECT
+        qasd.id,
+        assqusatt.userid,
+        assqusatt.assignmentques,
+        assqusatt.id AS assqusattid,
+        assqusatt.attempt,
+        assqusatt.sumgrades,
+        qu.preferredbehaviour,
+        qa.slot,
+        qa.behaviour,
+        qa.questionid,
+        qa.variant,
+        qa.maxmark,
+        qa.minfraction,
+        qa.flagged,
+        qas.sequencenumber,
+        qas.state,
+        qas.fraction, 
+        qas.timecreated,   
+        qas.userid,
+        qasd.name,
+        qasd.value,
+        qa.questionsummary,
+        qa.rightanswer,
+        qa.responsesummary      
+        FROM mdl_assignmentques_attempts assqusatt
+        JOIN mdl_question_usages qu ON qu.id = assqusatt.uniqueid
+        JOIN mdl_question_attempts qa ON qa.questionusageid = qu.id
+        JOIN mdl_question_attempt_steps qas ON qas.questionattemptid = qa.id
+        LEFT JOIN mdl_question_attempt_step_data qasd ON qasd.attemptstepid = qas.id 
+        WHERE assqusatt.id = $attemptid and slot=$slot";
+        $history=$DB->get_records_sql($sql);   
+        $output.='<div class="responsehistory">
+                <!--<h4 class="responsehistoryheader">'.get_string('responsehistory','assignmentques').'</h4>-->
+               ';
+        $answ=0;$feedcount=0;
+        foreach($history as $data){             
+            if($data->name=='' or $data->name=='-comment' or $data->name=='answer'){  
+                $status='';
+                $condition = array('question_attempt_step_dataid'=>$data->id);                      
+                $questionComment=$DB->get_record('assignmentques_comment', $condition);
+                if($questionComment){
+                    $status=$questionComment->status;                   
+                }
+                if($data->name==''){
+                    /*$answ++;
+                    $output.='
+                    <div class="notstarted">
+                        <h4>'.get_string('learneranswer','assignmentques').' '. $answ .'</h4>                       
+                        <div class="contectarea">
+                         <p>'.get_string('notyetanswered','assignmentques').'</p>
+                        </div>
+                    </div>';*/
+                }elseif($data->name=='-comment' and $status!='needcorrectioniqa'){
                     $feedcount++;
                     $stet=!empty($status)?get_string($status,'assignmentques'):get_string('commented','assignmentques');                    
                     $output.='
@@ -330,9 +451,9 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
         $output.=    '</tbody>';
         $output.=  '</table></div>';
         return $output;
-        /*******Get hestory table table end********/
+        
     }
-
+    /*******Get hestory table table end********/
     /**
      * Renders each question
      *
@@ -348,21 +469,46 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
         global $CFG,$DB;
         $uniqueid=$attemptobj->get_attempt()->uniqueid;                 
         $output = '';
-        foreach ($slots as $slot) {            
+        foreach ($slots as $slot) {                        
             $attemptid=$attemptobj->get_attemptid();   
             $conditions = array('attempt'=>$attemptid,'slot'=>$slot);              
-            $questionComment=$DB->get_records('assignmentques_comment', $conditions);            
+            $questionComment=$DB->get_records('assignmentques_comment', $conditions); 
+            $labl='';
+            $questionAttemptData = '';
+            $conditions = array('questionusageid'=>$uniqueid,'slot'=>$slot);
+            $questionAttempt=$DB->get_record('question_attempts', $conditions);
+            if($questionAttempt){
+                $conditions = array('questionattemptid'=> $questionAttempt->id);
+                $questionAttemptSteps=end($DB->get_records('question_attempt_steps', $conditions));
+                if($questionAttemptSteps){
+                    $conditions = array('attemptstepid'=> $questionAttemptSteps->id);
+                    $questionAttemptData=end($DB->get_records('question_attempt_step_data', $conditions));
+                }
+            }
+            if($questionComment){
+                if($questionAttemptData->name=='-finish'){
+                    $labl='<label class="current-status-quesfinish">'.get_string('quesfinish','assignmentques').'</label>';
+                }elseif($questionAttemptData->name=='-maxmark'){
+                    $labl='<label class="current-status-quesfinish">'.get_string('quesfinishbyteacher','assignmentques').'</label>';
+                }
+                elseif(end($questionComment)->status){         
+                    $showcolors = get_config('block_quescolorsetting',end($questionComment)->status);	         
+                    $labl='<label class="current-status" style="color:'.$showcolors.';">'.get_string(end($questionComment)->status,'assignmentques').'</label>';
+                }        
+            }            
             $prifix='q' . $uniqueid . ':' . $slot . '_';
             $output .= html_writer::start_tag('div',array(                
                 'id'    => 'goto_'.$slot,
                 'class' => 'quewrap adminsite collapsed'
             ));
             $output .='<a class="collapsedtoggel" href="#goto_'.$slot.'"><i class="fa fa-angle-down" aria-hidden="true"></i></a>';
+            $output .=  $labl;
             $output .= $attemptobj->render_question($slot, $reviewing, $this,
                     $attemptobj->review_url($slot, $page, $showall));            
-            $output .=$this->responseHistory($attemptid,$slot);            
-            $output .=$this->customeComment($questionComment,$attemptobj,$slot,$prifix); 
-
+            $output .=$this->responseHistory($attemptid,$slot); 
+            if($questionAttemptData->name!='-maxmark'){
+                $output .=$this->customeComment($questionComment,$attemptobj,$slot,$prifix,$questionAttemptData->name); 
+            } 
             $output .= html_writer::end_tag('div');
         }
         return $output;
@@ -679,8 +825,10 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
         $disabled=false;
         foreach ($slots as $slot) {
             $attemptid=$attemptobj->get_attemptid();
-
-            if( $ii!=0){
+            $stusubmittype = get_config('block_quescolorsetting','stusubmittype');
+            if($stusubmittype){
+               $disabled = false;
+            }elseif( $ii!=0){
                 $conditions=array('questionusageid'=>$uniqueid,'slot'=>($slot-1));
                 $quesattempt=end($DB->get_records('question_attempts', $conditions));
     
@@ -708,9 +856,9 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
                 ){
                     $disable='disable';
                     $labl='<label class="doneques">'.get_string(end($questionComment)->status,'assignmentques').'</label>';
-                }elseif(end($questionComment)->status){
+                }elseif(end($questionComment)->status=='needcorrectioniqa' or end($questionComment)->status=='needcorrection'){
                     $disable='';
-                    $labl='<label class="needcorrection">'.get_string(end($questionComment)->status,'assignmentques').'</label>';
+                    $labl='<label class="needcorrection">'.get_string('needcorrection','assignmentques').'</label>';
                 }else{
                     $disable='';
                 }          
@@ -727,7 +875,7 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
             $questh=$DB->get_record('question_attempts', $conditions);
 
             $output.='<div class="qtextcustome">'.$questh->questionsummary.'</div>';
-            $output .=$this->responseHistory($attemptid,$slot);  
+            $output .=$this->responseHistoryForStu($attemptid,$slot);  
             
             $output .= $attemptobj->render_question($slot, false, $this,
             $attemptobj->attempt_url($slot, $page), $this);

@@ -997,7 +997,7 @@ $string['yourfinalgradeis'] = 'Your final grade for this assignmentques is {$a}.
 $string['notchangessaved'] = 'Not Save';
 $string['needcorrection'] = 'Need Correction';
 $string['passedtoiqa'] = 'Passed To IQA';
-$string['needcorrectioniqa'] = 'Need Correction IQA';
+$string['needcorrectioniqa'] = 'Need Correction From IQA';
 $string['iqaagreeonpass'] = 'IQA Agree on a pass';
 $string['notyetanswered']= 'Not yet answered';
 $string['commented']= 'Commented';
@@ -1007,5 +1007,11 @@ $string['responsehistory'] = 'Response history';
 $string['currantstatus'] = 'Currant Status';
 $string['learneranswer'] = 'Learner Answer';
 $string['assessorfeedback'] = 'Assessor feedback';
+$string['iqafeedback'] = 'IQA feedback';
+$string['quesfinish'] = 'Question finished by student';
+$string['quesfinishbyteacher'] = 'Question finished';
+$string['finishbtn'] = 'Done';
+
+
 
 

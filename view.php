@@ -150,7 +150,7 @@ if ($attempts) {
 
     $viewobj->attemptcolumn  = $assignmentques->attempts != 1;
 
-    $viewobj->gradecolumn    = $someoptions->marks >= question_display_options::MARK_AND_MAX &&
+    //$viewobj->gradecolumn    = $someoptions->marks >= question_display_options::MARK_AND_MAX &&
             assignmentques_has_grades($assignmentques);
     $viewobj->markcolumn     = $viewobj->gradecolumn && ($assignmentques->grade != $assignmentques->sumgrades);
     $viewobj->overallstats   = $lastfinishedattempt && $alloptions->marks >= question_display_options::MARK_AND_MAX;
@@ -208,7 +208,7 @@ if (!$viewobj->assignmentqueshasquestions) {
             } else if ($viewobj->numattempts == 0) {
                 $viewobj->buttontext = get_string('attemptassignmentquesnow', 'assignmentques');
             } else {
-                $viewobj->buttontext = get_string('reattemptassignmentques', 'assignmentques');
+                //$viewobj->buttontext = get_string('reattemptassignmentques', 'assignmentques');
             }
 
         } else if ($canpreview) {

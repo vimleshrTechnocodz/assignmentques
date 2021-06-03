@@ -29,6 +29,8 @@ require_once('locallib.php');
 $attemptid = required_param('attempt', PARAM_INT);
 $slot = required_param('slot', PARAM_INT); // The question number in the attempt.
 $forcecomment = optional_param('forcecomment',null, PARAM_INT);
+$mark = optional_param('mark',null, PARAM_INT);
+
 $status = optional_param('status',null, PARAM_RAW);
 $commentdata = optional_param('commentdata',null, PARAM_RAW);
 $cmid = optional_param('cmid', null, PARAM_INT);
@@ -131,8 +133,8 @@ if (data_submitted() && confirm_sesskey()) {
             $commentcon = array('attempt'=>$attempt->id,'slot'=>$slot);            
             $teachers = $DB->get_records('assignmentques_comment', $commentcon);
             
-            $recipient = \core_user::get_user($attemptobj->get_userid());
-            assignmentques_send_confirmation($recipient, $a);
+            //$recipient = \core_user::get_user($attemptobj->get_userid());
+            //assignmentques_send_confirmation($recipient, $a);
 
             $usercheker=array();
             foreach($teachers as $teacher){
@@ -150,8 +152,8 @@ if (data_submitted() && confirm_sesskey()) {
             $commentcon = array('attempt'=>$attempt->id,'slot'=>$slot);            
             $teachers = $DB->get_records('assignmentques_comment', $commentcon);
             
-            $recipient = \core_user::get_user($attemptobj->get_userid());
-            assignmentques_send_confirmation($recipient, $a);
+            //$recipient = \core_user::get_user($attemptobj->get_userid());
+            //assignmentques_send_confirmation($recipient, $a);
 
             $usercheker=array();
             foreach($teachers as $teacher){
@@ -166,7 +168,7 @@ if (data_submitted() && confirm_sesskey()) {
         //print_r($notiCheck);
         //return;    
         $commentTime=time();
-        $uniqueid=$attemptobj->get_attempt()->uniqueid;
+        $uniqueid=$attemptobj->get_attempt()->uniqueid;       
         $slotNumber=$slot;
         $conditions = array('questionusageid'=>$uniqueid,'slot'=>$slot);
         $sequence = $attemptobj->get_question_attempt($slot)->get_sequence_check_count();
@@ -176,11 +178,34 @@ if (data_submitted() && confirm_sesskey()) {
             $attempt_steps=new stdClass();
             $attempt_steps->questionattemptid=$questionAttempt->id;
             $attempt_steps->sequencenumber=$sequence;
-            $attempt_steps->state='complete';
+            if($mark){
+                $attempt_steps->state='mangrright';
+                $attempt_steps->fraction=1.0000000;                 
+            }else{
+                $attempt_steps->state='complete';
+            }
+            
             $attempt_steps->timecreated=$commentTime;
             $attempt_steps->userid=$currentUserID;
             $insId = $DB->insert_record('question_attempt_steps', $attempt_steps);
-            if($insId){                
+            if($insId){ 
+                if($mark){
+                    $attempt_step_data = new stdClass();
+                    $attempt_step_data->attemptstepid=$insId;
+                    $attempt_step_data->name='-mark';
+                    $attempt_step_data->value='1';
+                    $insDataIdf = $DB->insert_record('question_attempt_step_data', $attempt_step_data);
+                    $attempt_step_data->name='-maxmark';
+                    $insDataIds = $DB->insert_record('question_attempt_step_data', $attempt_step_data);
+                   
+                    $assignmentquesGrades = new stdClass();
+                    $assignmentquesGrades->assignmentques = $assignmentquesid;
+                    $assignmentquesGrades->userid = $attemptobj->get_userid();
+                    $assignmentquesGrades->grade = 10.00000;
+                    $assignmentquesGrades->timemodified = $commentTime;
+                    $assgrades = $DB->insert_record('assignmentques_grades', $assignmentquesGrades);                    
+                    echo 1;die;
+                }               
                 $attempt_step_data = new stdClass();
                 $attempt_step_data->attemptstepid=$insId;
                 $attempt_step_data->name='-comment';
