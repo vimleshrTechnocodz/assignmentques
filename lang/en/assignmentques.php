@@ -1006,6 +1006,7 @@ $string['answersaved'] = 'Answer saved';
 $string['responsehistory'] = 'Response history';
 $string['currantstatus'] = 'Currant Status';
 $string['learneranswer'] = 'Learner Answer';
+$string['draftanswer'] = 'Draft Answer';
 $string['assessorfeedback'] = 'Assessor feedback';
 $string['iqafeedback'] = 'IQA feedback';
 $string['quesfinish'] = 'Question finished by student';

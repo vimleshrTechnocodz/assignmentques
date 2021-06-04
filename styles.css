@@ -1297,7 +1297,10 @@ table#categoryquestions {
 .quewrap.collapsed .responsehistory{
     display: none;
 }
-.quewrap.collapsed .endtestlinkajax.btn.btn-default{
+.quewrap .endtestlinkajax.btn.btn-default,.quewrap .draftques.btn.btn-info{
+    margin:5px 5px 5px 5px;
+}
+.quewrap.collapsed .endtestlinkajax.btn.btn-default,.quewrap.collapsed .draftques.btn.btn-info{
     display: none;
 }
 .quewrap .readonly{

@@ -156,7 +156,6 @@ M.mod_assignmentques.nav.init = function(Y) {
     if (form) {
         function nav_to_page(pageno,returnurl='') {            
             Y.one('#followingpage').set('value', pageno);
-
             // Automatically submit the form. We do it this strange way because just
             // calling form.submit() does not run the form's submit event handlers.
             var submit = form.one('input[name="next"]');
@@ -366,6 +365,37 @@ jQuery(function($) {
                     form.find(".loading").hide();
                     alert("Not save please try again");                    
                 }
+            }
+          });
+    });
+
+
+    //Draft code 
+    $(".draftques").click(function(e){
+        e.preventDefault();
+        var form = $(".studentsubmit"); 
+        var url = M.cfg.wwwroot+'/mod/assignmentques/autosave.ajax.php';
+        $.ajax({
+            type: 'post',
+            dataType: "html",   
+            url: url,
+            data: form.serialize(),
+            beforeSend: function() {               
+               form.find(".loading").toggleClass('hideload');               
+            },
+            success: function (data) {                
+                if(data){
+                    alert('Saved in draft');
+                    form.find(".loading").toggleClass('hideload');                    
+                }else{
+                    form.find(".loading").toggleClass('hideload');   
+                    alert("Error in draft please try again");                    
+                }
+            },
+            error: function(result){
+                console.log(result);
+                form.find(".loading").toggleClass('hideload');   
+                alert("Error in draft please try again");
             }
           });
     });

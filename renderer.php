@@ -287,7 +287,7 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
         JOIN mdl_question_attempts qa ON qa.questionusageid = qu.id
         JOIN mdl_question_attempt_steps qas ON qas.questionattemptid = qa.id
         LEFT JOIN mdl_question_attempt_step_data qasd ON qasd.attemptstepid = qas.id 
-        WHERE assqusatt.id = $attemptid and slot=$slot";
+        WHERE assqusatt.id = $attemptid and slot=$slot and qas.sequencenumber>=0";
         $history=$DB->get_records_sql($sql);   
         $output.='<div class="responsehistory">
                 <!--<h4 class="responsehistoryheader">'.get_string('responsehistory','assignmentques').'</h4>-->
@@ -411,15 +411,14 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
                 if($questionComment){
                     $status=$questionComment->status;                   
                 }
-                if($data->name==''){
-                    /*$answ++;
+                if($data->sequencenumber<0){                    
                     $output.='
-                    <div class="notstarted">
-                        <h4>'.get_string('learneranswer','assignmentques').' '. $answ .'</h4>                       
+                    <div class="notstarted" style="background: #fcff33;padding: 10px;margin-top: 20px;">
+                        <h4>'.get_string('draftanswer','assignmentques').'</h4>                       
                         <div class="contectarea">
-                         <p>'.get_string('notyetanswered','assignmentques').'</p>
+                         <p>'.$data->value.'</p>
                         </div>
-                    </div>';*/
+                    </div>';
                 }elseif($data->name=='-comment' and $status!='needcorrectioniqa'){
                     $feedcount++;
                     $stet=!empty($status)?get_string($status,'assignmentques'):get_string('commented','assignmentques');                    
@@ -879,18 +878,18 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
             
             $output .= $attemptobj->render_question($slot, false, $this,
             $attemptobj->attempt_url($slot, $page), $this);
-
-            $output .= html_writer::link(new moodle_url('', array('returnurl'=>$slot)),
-            'Submit',array(
-                'class' => 'endtestlinkajax btn btn-default',                               
-                'style' => 'margin:8px 50px 0 6px;'
-            )); 
-
+            $output .='<a href="#" class="draftques btn btn-info">Draft</a>';
             $output .= html_writer::end_tag('div');         
         }
         if($allfinish!=count($slots)){
             $submithide='submithide';
+            $output .= html_writer::link(new moodle_url('', array('returnurl'=>$slot)),
+            'Submit',array(
+                'class' => 'endtestlinkajax btn btn-default',                               
+                'style' => 'float: right;'
+            )); 
         }
+        
         $output .='<div class="'.$submithide.'">';
         $navmethod = $attemptobj->get_assignmentques()->navmethod;
         $output .= $this->attempt_navigation_buttons($page, $attemptobj->is_last_page($page), $navmethod);

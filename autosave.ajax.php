@@ -62,3 +62,4 @@ if ($attemptobj->is_finished()) {
 $attemptobj->process_auto_save($timenow);
 $transaction->allow_commit();
 echo 'OK';
+die;
