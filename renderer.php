@@ -879,15 +879,15 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
             $output .= $attemptobj->render_question($slot, false, $this,
             $attemptobj->attempt_url($slot, $page), $this);
             $output .='<a href="#" class="draftques btn btn-info">Draft</a>';
-            $output .= html_writer::end_tag('div');         
-        }
-        if($allfinish!=count($slots)){
-            $submithide='submithide';
             $output .= html_writer::link(new moodle_url('', array('returnurl'=>$slot)),
             'Submit',array(
                 'class' => 'endtestlinkajax btn btn-default',                               
-                'style' => 'float: right;'
+                'style' => ''
             )); 
+            $output .= html_writer::end_tag('div');         
+        }
+        if($allfinish!=count($slots)){
+            $submithide='submithide';            
         }
         
         $output .='<div class="'.$submithide.'">';
