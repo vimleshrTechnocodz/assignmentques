@@ -123,6 +123,7 @@
     line-height: 1.5em;
     font-weight: bold;
     text-decoration: none;
+    color: #000 !important;
 }
 
 .path-mod-assignmentques .qnbutton:visited:hover,

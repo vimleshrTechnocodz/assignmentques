@@ -154,7 +154,7 @@ class mod_assignmentques_mod_form extends moodleform_mod {
         $pagegroup = array();
         $pagegroup[] = $mform->createElement('select', 'questionsperpage',
                 get_string('newpage', 'assignmentques'), assignmentques_questions_per_page_options(), array('id' => 'id_questionsperpage'));
-        //$mform->setDefault('questionsperpage', $assignmentquesconfig->questionsperpage);
+        $mform->setDefault('questionsperpage', $assignmentquesconfig->questionsperpage);
 
         if (!empty($this->_cm)) {
             $pagegroup[] = $mform->createElement('checkbox', 'repaginatenow', '',

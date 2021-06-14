@@ -348,11 +348,18 @@ jQuery(function($) {
         e.preventDefault();
         var form = $(".studentsubmit"); 
         var url = $(".studentsubmit").attr('action');
-        //console.log(url);return;
+        var pageidmatch = $(this).attr('href').match(/returnurl=(\d+)/);
+        var pageno;
+        if (pageidmatch) {
+            pageno = pageidmatch[1];
+        }else{
+            pageno =-1;
+        }
+        var data = form.serialize()+ '&thispage=' + pageno;
         $.ajax({
             type: 'post',
             url: url,
-            data: form.serialize(),
+            data: data,
             beforeSend: function() {               
                form.find(".loading").toggleClass('hideload');
             },

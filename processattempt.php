@@ -95,6 +95,10 @@ if($status=='inprogress'){
     $attempt = $attemptobj->get_attempt();        
     $assignmentques = $attemptobj->get_assignmentques();
     $assignmentquesid = $assignmentques->id;  
+    $updateAtt = new stdclass;
+    $updateAtt->id = $attempt->id;
+    $updateAtt->preview = 0;
+    $DB->update_record('assignmentques_attempts', $updateAtt);
     $a->courseid=$course->id;
     $a->assignmentquesreviewurl = $CFG->wwwroot . '/mod/assignmentques/review.php?attempt=' . $attempt->id;
     $a->assignmentquesname=$assignmentques->name;
@@ -108,7 +112,7 @@ if($status=='inprogress'){
     $recipient = \core_user::get_user($attemptobj->get_userid());
     $conditions = array('attempt'=>$attempt->id,'slot'=>$slot);
     $questionrecipients=$DB->get_records('assignmentques_comment', $conditions);
-    $usercheker=array();
+    $usercheker=array();    
     if($questionrecipients){
         foreach($questionrecipients as $questionrecipient){
             if(in_array($questionrecipient->userid, $usercheker) == false){
