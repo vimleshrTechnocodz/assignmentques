@@ -480,17 +480,19 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
                 $conditions = array('questionattemptid'=> $questionAttempt->id);
                 $questionAttemptSteps=end($DB->get_records('question_attempt_steps', $conditions));
                 if($questionAttemptSteps){
-                    $conditions = array('attemptstepid'=> $questionAttemptSteps->id);
-                    $questionAttemptData=end($DB->get_records('question_attempt_step_data', $conditions));
+                    $conditions = array('attemptstepid'=> $questionAttemptSteps->id);                    
+                    $questionAttemptData=end($DB->get_records('question_attempt_step_data', $conditions));                   
                 }
             }
             if($questionComment){
                 if($questionAttemptData->name=='-finish'){
                     $labl='<label class="current-status-quesfinish">'.get_string('quesfinish','assignmentques').'</label>';
+                }elseif($questionAttemptData->name=='answer' or $questionAttemptData->name=='answerformat'){                    
+                    $showcolors = get_config('block_quescolorsetting','resubmitted');	
+                    $labl='<label class="current-status-resubmitted" style="color:'.$showcolors.';">'.get_string('resubmitted','assignmentques').'</label>';
                 }elseif($questionAttemptData->name=='-maxmark'){
                     $labl='<label class="current-status-quesfinish">'.get_string('quesfinishbyteacher','assignmentques').'</label>';
-                }
-                elseif(end($questionComment)->status){         
+                }elseif(end($questionComment)->status){         
                     $showcolors = get_config('block_quescolorsetting',end($questionComment)->status);	         
                     $labl='<label class="current-status" style="color:'.$showcolors.';">'.get_string(end($questionComment)->status,'assignmentques').'</label>';
                 }        
@@ -829,19 +831,28 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
                $disabled = false;
             }elseif( $ii!=0){
                 $conditions=array('questionusageid'=>$uniqueid,'slot'=>($slot-1));
-                $quesattempt=end($DB->get_records('question_attempts', $conditions));
-    
+                $quesattempt=end($DB->get_records('question_attempts', $conditions));    
                 $conditions=array('questionattemptid'=>$quesattempt->id);
                 $step=end($DB->get_records('question_attempt_steps', $conditions)); 
                 if($step->state=='todo')
-                $disabled = true;
+                $disabled = true;                
             }
 			$ii++;
 
             $conditions = array('attempt'=>$attemptid,'slot'=>$slot);              
             $questionComment=$DB->get_records('assignmentques_comment', $conditions);  
             
-            
+            $questionAttemptData = '';
+            $conditions = array('questionusageid'=>$uniqueid,'slot'=>$slot);
+            $questionAttempt=$DB->get_record('question_attempts', $conditions);
+            if($questionAttempt){
+                $conditions = array('questionattemptid'=> $questionAttempt->id);
+                $questionAttemptSteps=end($DB->get_records('question_attempt_steps', $conditions));
+                if($questionAttemptSteps){
+                    $conditions = array('attemptstepid'=> $questionAttemptSteps->id);                    
+                    $questionAttemptData=end($DB->get_records('question_attempt_step_data', $conditions));                   
+                }
+            }
             
             $disable='';
             $labl='';        
@@ -849,7 +860,10 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
                 if(end($questionComment)->status=='iqaagreeonpass'){
                    $allfinish++; 
                 }
-                if(
+                if($questionAttemptData->name=='answer' or $questionAttemptData->name=='answerformat'){                    
+                    $showcolors = get_config('block_quescolorsetting','resubmitted');	
+                    $labl='<label class="current-status-resubmitted" style="color:'.$showcolors.';">'.get_string('resubmitted','assignmentques').'</label>';
+                }elseif(
                     end($questionComment)->status=='passedtoiqa' or 
                     end($questionComment)->status=='iqaagreeonpass'
                 ){
@@ -876,14 +890,19 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
             $output.='<div class="qtextcustome">'.$questh->questionsummary.'</div>';
             $output .=$this->responseHistoryForStu($attemptid,$slot);  
             
-            $output .= $attemptobj->render_question($slot, false, $this,
-            $attemptobj->attempt_url($slot, $page), $this);
-            $output .='<a href="#" class="draftques btn btn-info">Draft</a>';
-            $output .= html_writer::link(new moodle_url('', array('returnurl'=>$slot)),
-            'Submit',array(
-                'class' => 'endtestlinkajax btn btn-default',                               
-                'style' => ''
-            )); 
+            if(
+                end($questionComment)->status!='passedtoiqa' and 
+                end($questionComment)->status!='iqaagreeonpass'
+            ){
+                $output .= $attemptobj->render_question($slot, false, $this,
+                $attemptobj->attempt_url($slot, $page), $this);            
+                $output .='<a href="#" class="draftques btn btn-info">Draft</a>';
+                $output .= html_writer::link(new moodle_url('', array('returnurl'=>$slot)),
+                'Submit',array(
+                    'class' => 'endtestlinkajax btn btn-default',                               
+                    'style' => ''
+                )); 
+            }
             $output .= html_writer::end_tag('div');         
         }
         if($allfinish!=count($slots)){

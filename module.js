@@ -346,6 +346,8 @@ jQuery(function($) {
     });
     $(".endtestlinkajax").click(function(e){
         e.preventDefault();
+        $('.quewrap.usersite.adminsite.collapsed .answersaved input').attr('disabled','disabled');
+        $('.quewrap.usersite.adminsite.collapsed .answersaved textarea').attr('disabled','disabled');
         var form = $(".studentsubmit"); 
         var url = $(".studentsubmit").attr('action');
         var pageidmatch = $(this).attr('href').match(/returnurl=(\d+)/);
@@ -355,7 +357,9 @@ jQuery(function($) {
         }else{
             pageno =-1;
         }
-        var data = form.serialize()+ '&thispage=' + pageno;
+        var data = form.serialize()+ '&thispage=' + pageno;  
+        $('.quewrap.usersite.adminsite.collapsed .answersaved input').removeAttr('disabled','disabled');
+        $('.quewrap.usersite.adminsite.collapsed .answersaved textarea').removeAttr('disabled','disabled');     
         $.ajax({
             type: 'post',
             url: url,

@@ -1343,6 +1343,16 @@ table#categoryquestions {
     border-radius: 10px;
     top: 2px;
 }
+.quewrap  .current-status-resubmitted{
+    position: absolute;
+    right: 2px;
+    font-weight: 800;
+    color: rgb(0, 0, 0);
+    background: #fff;
+    padding: 0 12px;
+    border-radius: 10px;
+    top: 2px;
+}
 .current-status-quesfinish{
     position: absolute;
     right: 0;

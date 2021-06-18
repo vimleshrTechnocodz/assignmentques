@@ -1001,6 +1001,9 @@ $string['needcorrectioniqa'] = 'Need Correction From IQA';
 $string['iqaagreeonpass'] = 'IQA Agree on a pass';
 $string['notyetanswered']= 'Not yet answered';
 $string['commented']= 'Commented';
+
+$string['resubmitted']= 'Re-Submitted';
+
 $string['saved']= 'Saved';
 $string['answersaved'] = 'Answer saved';
 $string['responsehistory'] = 'Response history';
