@@ -1446,6 +1446,9 @@ table#categoryquestions {
 .quewrap.usersite.collapsed .qtextcustome{
     background: #98fb98;
 }
+.quewrap.usersite.collapsed .qtextcustome.disable {
+    min-height: 43px;
+}
 .quewrap.usersite .info {
     display: none;
 }
