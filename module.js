@@ -409,5 +409,11 @@ jQuery(function($) {
                 alert("Error in draft please try again");
             }
           });
+    });     
+    $(".quewrap").each(function() {
+        var imgques = $(this).find(".que .content .qtext img").attr('src');
+        if(imgques){
+            $(this).find(".qtextcustome").append("<a title='Click to view' class='quesing' target='_blank' href='"+imgques+"'><img  src='"+imgques+"'/></a>");
+        }
     });
 });

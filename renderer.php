@@ -411,9 +411,10 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
                 if($questionComment){
                     $status=$questionComment->status;                   
                 }
-                if($data->sequencenumber<0){                    
+                if($data->sequencenumber<0){     
+                    $draftcolors = get_config('block_quescolorsetting','draft');               
                     $output.='
-                    <div class="notstarted" style="background: #fcff33;padding: 10px;margin-top: 20px;">
+                    <div class="notstarted" style="background: '.$draftcolors.';padding: 10px;margin-top: 20px;">
                         <h4>'.get_string('draftanswer','assignmentques').'</h4>                       
                         <div class="contectarea">
                          <p>'.$data->value.'</p>
@@ -835,8 +836,9 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
                 $conditions=array('questionattemptid'=>$quesattempt->id);
                 $step=end($DB->get_records('question_attempt_steps', $conditions)); 
                 if($step->state=='todo')
-                $disabled = true;                
-            }
+                $disabled = true;
+                           
+            }           
 			$ii++;
 
             $conditions = array('attempt'=>$attemptid,'slot'=>$slot);              
@@ -845,9 +847,15 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
             $questionAttemptData = '';
             $conditions = array('questionusageid'=>$uniqueid,'slot'=>$slot);
             $questionAttempt=$DB->get_record('question_attempts', $conditions);
+            $draftcolor = '';
             if($questionAttempt){
                 $conditions = array('questionattemptid'=> $questionAttempt->id);
-                $questionAttemptSteps=end($DB->get_records('question_attempt_steps', $conditions));
+                $questionAttemptSteps=$DB->get_records('question_attempt_steps', $conditions);
+                $draft =current($questionAttemptSteps)->sequencenumber;
+                if($draft<0)
+                $draftcolor = get_config('block_quescolorsetting','draft');
+                $questionAttemptSteps=end($questionAttemptSteps);
+                
                 if($questionAttemptSteps){
                     $conditions = array('attemptstepid'=> $questionAttemptSteps->id);                    
                     $questionAttemptData=end($DB->get_records('question_attempt_step_data', $conditions));                   
@@ -885,9 +893,8 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
             $output .=  $labl;
 
             $conditions = array('questionusageid'=>$uniqueid,'slot'=>$slot);              
-            $questh=$DB->get_record('question_attempts', $conditions);
-
-            $output.='<div class="qtextcustome">'.$questh->questionsummary.'</div>';
+            $questh=$DB->get_record('question_attempts', $conditions);                
+            $output.='<div class="qtextcustome" style="background:'.$draftcolor.';">'.$questh->questionsummary.'</div>';
             $output .=$this->responseHistoryForStu($attemptid,$slot);  
             
             if(

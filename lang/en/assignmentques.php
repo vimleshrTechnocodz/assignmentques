@@ -295,8 +295,8 @@ $string['editoverride'] = 'Edit override';
 $string['editqcats'] = 'Edit questions categories';
 $string['editquestion'] = 'Edit question';
 $string['editquestions'] = 'Edit questions';
-$string['editassignmentques'] = 'Edit assignmentques';
-$string['editassignmentquesquestions'] = 'Edit assignmentques questions';
+$string['editassignmentques'] = 'Edit Assingment-Questions';
+$string['editassignmentquesquestions'] = 'Edit Assingment-Questions questions';
 $string['emailconfirmbody'] = 'Hi {$a->username},
 
 Thank you for submitting your answers to \'{$a->assignmentquesname}\' in course \'{$a->coursename}\' at {$a->submissiontime}.
@@ -487,7 +487,7 @@ $string['minutes'] = 'Minutes';
 $string['missingcorrectanswer'] = 'Correct answer must be specified';
 $string['missingitemtypename'] = 'Missing name';
 $string['missingquestion'] = 'This question no longer seems to exist';
-$string['modulename'] = 'Assignmentques';
+$string['modulename'] = 'Assingment-Questions';
 $string['modulename_help'] = 'The assignmentques activity enables a teacher to create assignmentqueszes comprising questions of various types, including multiple choice, matching, short-answer and numerical.
 
 The teacher can allow the assignmentques to be attempted multiple times, with the questions shuffled or randomly selected from the question bank. A time limit may be set.

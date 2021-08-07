@@ -257,20 +257,20 @@ class assignmentques_overview_table extends assignmentques_attempts_report_table
 
     /***Get comment status* */
     function get_comment_status($questionAttempt,$step){
-        $grade='';
+        $grade='';        
         if($questionAttempt){    
             if(!empty($questionAttempt->status)){
                 $showcolors = get_config('block_quescolorsetting',$questionAttempt->status);
                 $grade = '<span class="reportcol '.$questionAttempt->status.'" 
                     style="background:'.$showcolors.'"
                     title="'.get_string($questionAttempt->status,'assignmentques').'" 
-                    > </span>';
+                    > <b class="quest">'.$questionAttempt->question.'</b></span>';
             }else{
                 $showcolors = get_config('block_quescolorsetting','completecolor');
                 $grade = '<span class="reportcol '.$questionAttempt->status.'" 
                     style="background:'.$showcolors.'"
                     title="'.get_string('attempted','block_quescolorsetting').'" 
-                    > </span>'; 
+                    > <b class="quest">'.$questionAttempt->question.'</b></span>'; 
             }
         }else{                  
             if($step->state!='todo'){                
@@ -278,13 +278,13 @@ class assignmentques_overview_table extends assignmentques_attempts_report_table
                 $grade = '<span class="reportcol" 
                 style="background:'.$showcolors.'"
                 title="'.get_string('attempted','block_quescolorsetting').'" 
-                > </span>';
+                > <b class="quest">'.$questionAttempt->question.'</b></span>';
             }else{
                 $showcolors = get_config('block_quescolorsetting','notcompletecolor');
                 $grade = '<span class="reportcol" 
                 style="background:'.$showcolors.'"
                 title="'.get_string('notattempted','block_quescolorsetting').'" 
-                > </span>';
+                > <b class="quest">'.$questionAttempt->question.'</b></span>';
             }
         }
         return $grade;
@@ -307,7 +307,8 @@ class assignmentques_overview_table extends assignmentques_attempts_report_table
 
         $commentcon=array('questionusageid'=>$attempt->usageid,'slot'=>$slot);
 		$quesattempt=end($DB->get_records('question_attempts', $commentcon));
-
+        $question_t=$DB->get_record('question', array('id'=>$quesattempt->questionid));
+        $questionAttempt->question = strip_tags($question_t->questiontext);
         $commentcon=array('questionattemptid'=>$quesattempt->id);
 		$step =end($DB->get_records('question_attempt_steps', $commentcon));
 

@@ -1446,7 +1446,7 @@ table#categoryquestions {
 .quewrap.usersite.collapsed .qtextcustome{
     background: #98fb98;
 }
-.quewrap.usersite.collapsed .qtextcustome.disable {
+.quewrap.usersite.collapsed.disable .qtextcustome {
     min-height: 43px;
 }
 .quewrap.usersite .info {
@@ -1562,6 +1562,33 @@ table#categoryquestions {
     justify-content: center;
     background: #222;
     margin: 1px;
+}
+.reportcol .quest{
+    position: absolute;
+    bottom: 0;
+    width: max-content;
+    right: 10px;
+    padding: 0px 5px;
+    background: #fff;
+    display: none;
+    z-index: 9;
+}
+.reportcol:hover .quest{
+    display: inline-block;
+}
+.quewrap img{
+    max-width: 100%;
+}
+.quewrap .quesing{
+    display: block;
+}
+.quewrap.collapsed  .quesing,.quewrap.collapsed img{
+    display: none;
+}
+.quewrap .quesing img{
+    width: 30%;
+    display: block;
+    margin: auto;
 }
 /** Print formatting for attempt and review pages **/
 
