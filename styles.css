@@ -1649,3 +1649,7 @@ table#categoryquestions {
 .assignmentquessavegradesform.form-inline{
     display: none;
 }
+
+#mod_assignmentques_navblock .othernav{
+    display: none !important;
+}

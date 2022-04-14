@@ -879,7 +879,13 @@ class mod_assignmentques_renderer extends plugin_renderer_base {
                     $labl='<label class="doneques">'.get_string(end($questionComment)->status,'assignmentques').'</label>';
                 }elseif(end($questionComment)->status=='needcorrectioniqa' or end($questionComment)->status=='needcorrection'){
                     $disable='';
-                    $labl='<label class="needcorrection">'.get_string('needcorrection','assignmentques').'</label>';
+                    if(end($questionComment)->status=='needcorrectioniqa')
+                    {
+                        $disable='disable';
+                        $labl='<label class="doneques">'.get_string('passedtoiqa','assignmentques').'</label>';
+                    }elseif(end($questionComment)->status=='needcorrection'){
+                        $labl='<label class="needcorrection">'.get_string('needcorrection','assignmentques').'</label>';
+                    }
                 }else{
                     $disable='';
                 }          

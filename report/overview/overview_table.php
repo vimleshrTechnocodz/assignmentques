@@ -257,7 +257,7 @@ class assignmentques_overview_table extends assignmentques_attempts_report_table
 
     /***Get comment status* */
     function get_comment_status($questionAttempt,$step){
-        $grade='';        
+        $grade=''; 
         if($questionAttempt){    
             if(!empty($questionAttempt->status)){
                 $showcolors = get_config('block_quescolorsetting',$questionAttempt->status);
@@ -266,11 +266,20 @@ class assignmentques_overview_table extends assignmentques_attempts_report_table
                     title="'.get_string($questionAttempt->status,'assignmentques').'" 
                     > <b class="quest">'.$questionAttempt->question.'</b></span>';
             }else{
-                $showcolors = get_config('block_quescolorsetting','completecolor');
-                $grade = '<span class="reportcol '.$questionAttempt->status.'" 
+                if($step->state!='todo'){
+                    $showcolors = get_config('block_quescolorsetting','completecolor');
+                    $grade = '<span class="reportcol '.$questionAttempt->status.'" 
                     style="background:'.$showcolors.'"
                     title="'.get_string('attempted','block_quescolorsetting').'" 
                     > <b class="quest">'.$questionAttempt->question.'</b></span>'; 
+                }else{
+                    $showcolors = get_config('block_quescolorsetting','notcompletecolor');
+                    $grade = '<span class="reportcol '.$questionAttempt->status.'" 
+                    style="background:'.$showcolors.'"
+                    title="'.get_string('notattempted','block_quescolorsetting').'" 
+                    > <b class="quest">'.$questionAttempt->question.'</b></span>'; 
+                }
+                
             }
         }else{                  
             if($step->state!='todo'){                

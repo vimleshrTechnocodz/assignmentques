@@ -345,6 +345,7 @@ jQuery(function($) {
           });
     });
     $(".endtestlinkajax").click(function(e){
+        window.onbeforeunload = null;
         e.preventDefault();
         $('.quewrap.usersite.adminsite.collapsed .answersaved input').attr('disabled','disabled');
         $('.quewrap.usersite.adminsite.collapsed .answersaved textarea').attr('disabled','disabled');
@@ -397,10 +398,12 @@ jQuery(function($) {
             success: function (data) {                
                 if(data){
                     alert('Saved in draft');
-                    form.find(".loading").toggleClass('hideload');                    
+                    form.find(".loading").toggleClass('hideload'); 
+                    location.reload();                   
                 }else{
                     form.find(".loading").toggleClass('hideload');   
-                    alert("Error in draft please try again");                    
+                    alert("Error in draft please try again"); 
+                    location.reload();                   
                 }
             },
             error: function(result){
@@ -416,4 +419,5 @@ jQuery(function($) {
             $(this).find(".qtextcustome").append("<a title='Click to view' class='quesing' target='_blank' href='"+imgques+"'><img  src='"+imgques+"'/></a>");
         }
     });
+    $('#mod_assignmentques_navblock .othernav').remove();
 });
